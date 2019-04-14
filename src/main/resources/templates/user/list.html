@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/head" />
+<body>
+	<nav th:replace="fragments/nav" />
+
+	<div class="container">
+		<h2 th:text="#{users}">Usuarios</h2>
+		<form class="navbar-form" action="/user/list">
+			<div class="form-group">
+				<input name="searchText" type="text" class="form-control" size="50"
+					th:placeholder="#{users.search.criteria}" />
+			</div>
+			<button type="submit" class="btn btn-default" th:text="#{search}">Buscar</button>
+		</form>
+
+		<button type="button" id="updateButton" class="btn btn-default"
+			th:text="#{update}">Actualizar</button>
+
+		<script th:inline="javascript">
+ /*<![CDATA[*/
+ $( "#updateButton" ).click(function() {
+ var numberPage = [[${param.page}]];
+ var urlUpdate = '/user/list/update';
+ if ( numberPage != null ){
+ urlUpdate += "?page="+numberPage[0];
+ }
+ $("#tableUsers").load(urlUpdate);
+ });
+ /*]]>*/
+ </script>
+
+		<p th:text="#{users.show.text}">Los usuarios de la aplicación son
+			los siguientes:</p>
+		<div th:fragment="tableUsers" id="tableUsers">
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th th:text="#{name}">Nombre</th>
+							<th th:text="#{email}">Email</th>
+							<th class="col-md-1"></th>
+							<th class="col-md-1"></th>
+							<th class="col-md-1"></th>
+							<th class="col-md-1"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="user : ${usersList}">
+							<td th:text="${user.name}">Carlos</td>
+							<td th:text="${user.email}">c@hotmail.com</td>
+							<td>
+
+								<div>
+
+									<div th:if="${#lists.contains(amigos, user)}"
+										th:text="#{friend.added}">Amigo añadido</div>
+
+									<div th:unless="${#lists.contains(amigos, user)}">
+
+										<div th:if="${#lists.contains(peticionesSolicitadas, user)}"
+											th:text="#{petition.received}">Petición recibida</div>
+
+										<div
+											th:unless="${#lists.contains(peticionesSolicitadas, user)}">
+											<div th:if="${!user.equals(currentUser)}">
+												<div th:if="${#lists.contains(usuariosDestinos, user)}">
+
+
+													<div th:unless="${#lists.contains(amigos, user)}">
+														<button type="button"
+															th:id="${'cancelPetitionButton' + user.id}"
+															class="btn btn-default" th:text="#{petition.cancel}">Cancelar
+															petición</button>
+														<script th:inline="javascript">
+									 					/*<![CDATA[*/
+									 		 			$( "#cancelPetitionButton[[${user.id}]]" ).click(function() {
+									 		 			$.get( "/user/[[${user.id}]]/cancelPetition", function( data ) {
+									 		 			var numberPage = [[${param.page}]];
+									 		 			var urlUpdate = '/user/list/update';
+									 		 			if ( numberPage != null ){
+									 		 			urlUpdate += "?page="+numberPage[0];
+									 		 			}
+									 					$("#tableUsers").load(urlUpdate);
+									 		 			});
+									 		 			});
+									 		 		/*]]>*/
+									 				</script>
+													</div>
+
+												</div>
+
+												<div th:unless="${#lists.contains(usuariosDestinos, user)}">
+
+													<button type="button"
+														th:id="${'sendPetitionButton' + user.id}"
+														id="sendPetitionButton[[${user.id}]]" class="btn btn-info"
+														th:text="#{friend.add}">Agregar amigo</button>
+													<script th:inline="javascript">
+								 				/*<![CDATA[*/
+									 		 		$("#sendPetitionButton[[${user.id}]]" ).click(function() {
+									 		 		$.get( "/user/[[${user.id}]]/sendPetition", function( data ) {
+									 		 		var numberPage = [[${param.page}]];
+									 		 		var urlUpdate = '/user/list/update';
+									 		 		if ( numberPage != null ){
+									 		 		urlUpdate += "?page="+numberPage[0];
+	 		 										}
+	 												$("#tableUsers").load(urlUpdate);
+	 		 										});
+	 		 										});
+ 		 										/*]]>*/
+ 												</script>
+
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<footer th:replace="fragments/pagination" />
+		</div>
+	</div>
+
+	<footer th:replace="fragments/footer" />
+</body>
+</html>

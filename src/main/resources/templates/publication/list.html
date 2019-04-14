@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/head"/>
+<body>
+<nav th:replace="fragments/nav"/>
+
+<div class="container">
+  <h2 th:text = "#{publications}">Publicaciones</h2>
+	 
+  <p th:text = "#{publications.text}">Las publicaciones de la aplicación son las siguientes:</p>                                                                                      
+  <div th:fragment="tablePublications" id="tablePublications">
+  <div class="table-responsive">     
+  <table class="table table-hover" >
+    <thead>
+      <tr>
+        <th th:text="#{user}">Usuario</th>
+        <th th:text="#{title}">Titulo </th>
+        <th th:text="#{text}">Texto</th>
+        <th th:text="#{date}">Fecha</th>
+        <th></th>
+		<th class="col-md-1"> </th>
+		<th class="col-md-1"> </th>
+		<th class="col-md-1"> </th>
+		<th class="col-md-1"> </th>
+		<th class="col-md-1"> </th>
+		<th class="col-md-1"> </th>
+      </tr>
+    </thead>
+	<tbody>
+	  <tr th:each="publication : ${publicationsList}">
+	    <td th:text="${publication.user.email}">c@hotmail.com</td>
+	    <td th:text="${publication.title}">titulo</td>
+	    <td th:text="${publication.description}">texto</td>
+	    <td th:text="${publication.date}">Fecha</td>
+	    <div th:if="${publication.image == true}">
+	    	<td><a th:href="${'/fotossubidas/' + publication.id + '.png'}" th:text="#{picture}">publications</a></td>
+	    </div>
+	    <div th:unless="${publication.image == true}">
+	    	<td></td>
+	    </div>
+	    
+	  </tr>
+	</tbody>
+  </table>
+  </div>
+  </div>
+  <footer th:replace="fragments/pagination"/>
+</div>
+
+<footer th:replace="fragments/footer"/>
+</body>
+</html>
