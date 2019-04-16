@@ -25,6 +25,10 @@ public class RestService{
 		Date day = match.getDay();
 		Date hour = match.getHour();
 		
+		//System.out.println("camera -> "+camera.getIdentificador()+", "+camera.getObservers().toString());
+		System.out.println("person -> "+person.getIdentificador());
+		System.out.println("day -> "+day);
+		System.out.println("hour -> "+hour);
 		return new Match(camera, person, day, hour);
 	}
 }
