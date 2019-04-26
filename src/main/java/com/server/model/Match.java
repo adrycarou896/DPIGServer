@@ -3,21 +3,37 @@ package com.server.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+@Entity
 public class Match implements Serializable {
 	
 	private static final long serialVersionUID = -3709323805785851011L;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@ManyToOne
 	private Camera camera;
+	@ManyToOne
 	private Person person;
-	private Date day;
-	private Date hour;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date date;
 	
 	public Match() {}
 	
-	public Match(Camera camera, Person person, Date day, Date hour) {
+	public Match(Camera camera, Person person, Date date) {
 		this.camera = camera;
 		this.person = person;
-		this.day = day;
-		this.hour = hour;
+		this.date = date;
 		
 		//java.sql.Date date2 = new java.sql.Date(d.getTime());
 		
@@ -39,21 +55,12 @@ public class Match implements Serializable {
 		this.camera = camera;
 	}
 
-	public Date getDay() {
-		return day;
+	public Date getDate() {
+		return date;
 	}
 
-	public void setDay(Date day) {
-		this.day = day;
+	public void setDate(Date date) {
+		this.date = date;
 	}
-
-	public Date getHour() {
-		return hour;
-	}
-
-	public void setHour(Date hour) {
-		this.hour = hour;
-	}
-	
 	
 }

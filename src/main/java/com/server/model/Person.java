@@ -2,6 +2,10 @@ package com.server.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Person implements Serializable {
 	
 	/**
@@ -9,6 +13,7 @@ public class Person implements Serializable {
 	 */
 	private static final long serialVersionUID = -7915536599168677189L;
 	
+	@Id
 	private String identificador;
 	
 	public Person() {}
