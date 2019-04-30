@@ -3,11 +3,13 @@ package com.server.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -21,9 +23,9 @@ public class Match implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	private Camera camera;
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	private Person person;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
