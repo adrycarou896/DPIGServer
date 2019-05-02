@@ -8,8 +8,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="cameras")
 public class Camera implements Serializable {
 	
 	 private static final long serialVersionUID = 3560972546182458142L;
