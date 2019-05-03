@@ -1,13 +1,14 @@
 package com.server.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -15,37 +16,33 @@ import javax.persistence.Table;
 public class Camera implements Serializable {
 	
 	 private static final long serialVersionUID = 3560972546182458142L;
+	 
 	 @Id
-	 private String identificador;
-	 @OneToMany
+	 @GeneratedValue(strategy = GenerationType.IDENTITY)
+	 private Long id;
+	 
+	 private String name;
+	 
+	 @ManyToMany
 	 private List<Camera> observers;
 	 
 	 public Camera() {}
 	 
-	 public Camera(String identificador) {
-		 this.identificador = identificador;
-		 this.observers = new ArrayList<Camera>();
+	 public Camera(String name) {
+		 this.name = name;
 	 }
 	 
-	 public Camera(String identificador, List<Camera> observers) {
-		 this.identificador = identificador;
+	 public Camera(String name, List<Camera> observers) {
+		 this.name = name;
 		 this.observers = observers;
 	 }
 
-	public String getIdentificador() {
-		return identificador;
+	public String getName() {
+		return name;
 	}
 
-	public void setIdentificador(String identificador) {
-		this.identificador = identificador;
-	}
-
-	public List<Camera> getObservers() {
-		return observers;
-	}
-
-	public void setObservers(List<Camera> observers) {
-		this.observers = observers;
+	public void setName(String name) {
+		this.name = name;
 	}
 	 
 	 

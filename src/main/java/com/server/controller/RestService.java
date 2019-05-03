@@ -1,5 +1,6 @@
 package com.server.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.server.model.Camera;
 import com.server.model.Match;
 import com.server.model.Person;
+import com.server.model.dto.CameraDTO;
+import com.server.model.dto.MatchDTO;
+import com.server.model.dto.PersonDTO;
 import com.server.repository.MatchRepository;
 
 @RestController
@@ -24,15 +28,19 @@ public class RestService{
 	@RequestMapping(method = RequestMethod.POST, path = "/validateUser", //dirección del servicio
 			consumes = "application/json", produces = "application/json")
 	public @ResponseBody Match //Convierte Camara a JSON
-	validateUser(@RequestBody Match match) throws Exception {
-		Camera camera = match.getCamera();
-		Person person = match.getPerson();
-		Date date = match.getDate();
+	validateUser(@RequestBody MatchDTO matchDto) throws Exception {
+		CameraDTO cameraDto = matchDto.getCamera();
+		PersonDTO personDto = matchDto.getPerson();
+		Date date = matchDto.getDate();
 		
-		System.out.println("camera -> "+camera.getIdentificador()+", "+camera.getObservers().toString());
-		System.out.println("person -> "+person.getIdentificador());
+		System.out.println("camera -> "+cameraDto.getName());
+		System.out.println("person -> "+personDto.getName());
 		System.out.println("day -> "+date.toString());
-
+		
+		Camera camera = new Camera(cameraDto.getName(),new ArrayList<Camera>());
+		Person person = new Person(personDto.getName());
+		Match match = new Match(camera, person, date);
+		
 		matchRepository.save(match);
 		
 		return match;
