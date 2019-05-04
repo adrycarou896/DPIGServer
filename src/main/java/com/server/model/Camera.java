@@ -11,7 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Immutable;
+
 @Entity
+//@Immutable
 @Table(name="cameras")
 public class Camera implements Serializable {
 	
@@ -21,6 +24,7 @@ public class Camera implements Serializable {
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Long id;
 	 
+	 @Column(unique=true)
 	 private String name;
 	 
 	 @ManyToMany

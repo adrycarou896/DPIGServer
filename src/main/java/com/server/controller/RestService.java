@@ -17,25 +17,22 @@ import com.server.model.dto.CameraDTO;
 import com.server.model.dto.MatchDTO;
 import com.server.model.dto.PersonDTO;
 import com.server.repository.MatchRepository;
+import com.server.services.InsertDataService;
 
 @RestController
-@RequestMapping(path = "/servicesREST/JR")//Rura en la que encontramos el servicio
+@RequestMapping(path = "/sendFrame")//Rura en la que encontramos el servicio
 public class RestService{
 	
 	@Autowired
 	private MatchRepository matchRepository;
 
-	@RequestMapping(method = RequestMethod.POST, path = "/validateUser", //dirección del servicio
+	@RequestMapping(method = RequestMethod.POST, path = "/insertMatch", //dirección del servicio
 			consumes = "application/json", produces = "application/json")
 	public @ResponseBody Match //Convierte Camara a JSON
 	validateUser(@RequestBody MatchDTO matchDto) throws Exception {
 		CameraDTO cameraDto = matchDto.getCamera();
 		PersonDTO personDto = matchDto.getPerson();
 		Date date = matchDto.getDate();
-		
-		System.out.println("camera -> "+cameraDto.getName());
-		System.out.println("person -> "+personDto.getName());
-		System.out.println("day -> "+date.toString());
 		
 		Camera camera = new Camera(cameraDto.getName(),new ArrayList<Camera>());
 		Person person = new Person(personDto.getName());
