@@ -1,13 +1,22 @@
 package com.server.repository;
-import java.sql.Date;
+
+import java.util.Date;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.server.model.Match;
 
 public interface MatchRepository extends CrudRepository<Match, Long> {
-
+	
+	@Query(value="select m from Match m where m.camera.id=?1 AND m.person.id=?2")
+	Match findByCameraPerson(Long cameraId, Long personId);
+	
+	@Transactional
+	@Modifying
+	@Query(value="update Match m set m.date=?1 where m.camera.id=?2 and m.person.id=?3")
+	void updateMatch(Date date,Long cameraId, Long personId);
 }

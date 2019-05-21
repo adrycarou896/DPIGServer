@@ -44,7 +44,13 @@ public class RestService{
 		Person person = personRepository.findByName(personDto.getName());
 		Match match = new Match(camera, person, date);
 		
-		matchRepository.save(match);
+		Match macthFind = matchRepository.findByCameraPerson(camera.getId(), person.getId());
+		if(macthFind!=null) {
+			matchRepository.updateMatch(date, camera.getId(), person.getId());
+		}
+		else {
+			matchRepository.save(match);
+		}		
 		
 		return match;
 	}

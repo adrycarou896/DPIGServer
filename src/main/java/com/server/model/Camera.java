@@ -46,6 +46,10 @@ public class Camera implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public Long getId() {
+		return this.id;
+	}
 	 
 	 
 }
