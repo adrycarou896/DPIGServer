@@ -1,6 +1,8 @@
 package com.server.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.event.Event;
+import com.event.EventDistributor;
 import com.server.model.Camera;
 import com.server.model.Match;
 import com.server.model.Person;
@@ -52,6 +56,35 @@ public class RestService{
 			matchRepository.save(match);
 		}		
 		
+		searchPattern(person);
+		
 		return match;
+	}
+	
+	private void searchPattern(Person person) {
+		String[] reglas = new String[] {"camera1:Está en la clase 1","camera1->camera0:Salió de clase"};
+		EventDistributor eventDistributor = new EventDistributor();
+		List<Event> events = new ArrayList<Event>();
+		for (int i = 0; i < reglas.length; i++) {
+			String regla = reglas[i];
+			Event event = eventDistributor.getEvent(regla);
+			events.add(event);
+		}
+		
+		
+		List<Match> personMatches = matchRepository.findByPerson(person.getId());
+		Match ultimateMatch = personMatches.get(0);
+		if(ultimateMatch.getCamera().getName().equals("camera1")) {
+			System.out.println("Está en la clase 1");
+		}
+		else if(ultimateMatch.getCamera().getName().equals("camera0")) {
+			Match penUltimateMatch = personMatches.get(0);
+			if(penUltimateMatch!=null) {
+				if(penUltimateMatch.getCamera().getName().equals("camera1")) {
+					System.out.println("Salió de clase");
+				}
+			}
+		}
+		//C1 -> C2 -> C3 -> Un evento
 	}
 }

@@ -1,5 +1,10 @@
 package com.event;
 
-public interface Event{
+import java.util.List;
 
+import com.server.model.Match;
+
+public interface Event {
+	public int getPriority();
+	public boolean isSuccesed(List<Match> personMatches, int index);
 }
