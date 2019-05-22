@@ -10,9 +10,12 @@ public class EventComplex implements Event{
 	
 	private Event event1, event2;
 	
-	public EventComplex(Event event1, Event event2) {
+	private String mensaje;
+	
+	public EventComplex(Event event1, Event event2, String mensaje) {
 		this.event1 = event1;
 		this.event2 = event2;
+		this.mensaje = mensaje;
 		this.priority = event1.getPriority()+event2.getPriority();
 	}
 
@@ -33,8 +36,12 @@ public class EventComplex implements Event{
 	}
 
 	@Override
-	public boolean isSuccesed(List<Match> personMatches, int index) {
-		this.event1.isSuccesed(personMatches, priority);
+	public boolean isSuccesed(List<Match> personMatches) {
+		if(this.event1.isSuccesed(personMatches.subList(0, personMatches.size())) &&
+		   this.event2.isSuccesed(personMatches.subList(1, personMatches.size()))){
+			System.out.println(mensaje);	
+			return true;
+		}
 		return false;
 	}
 

@@ -7,7 +7,7 @@ import com.server.model.Match;
 
 public class EventSimple implements Event{
 	
-	private int priority = 1;
+	private int priority;
 	private Camera camera;
 	private String mensaje;
 	
@@ -21,13 +21,15 @@ public class EventSimple implements Event{
 	}
 	
 	@Override
-	public  boolean isSuccesed(List<Match> personMatches, int index) {
-		Match ultimateMatch = personMatches.get(priority-1);
-		if(ultimateMatch.getCamera().getName().equals(camera.getName())) {
-			if(mensaje!=null) {
-				System.out.println(mensaje);
+	public boolean isSuccesed(List<Match> personMatches) {
+		if(personMatches.size()>0) {
+			Match ultimateMatch = personMatches.get(0);
+			if(ultimateMatch.getCamera().getName().equals(camera.getName())) {
+				if(mensaje!=null) {
+					System.out.println(mensaje);
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}

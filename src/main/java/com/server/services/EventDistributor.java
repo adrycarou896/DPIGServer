@@ -1,10 +1,15 @@
-package com.event;
+package com.server.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.event.Event;
+import com.event.EventComplex;
+import com.event.EventSimple;
 import com.server.model.Camera;
 import com.server.repository.CameraRepository;
 
+@Service
 public class EventDistributor {
 	
 	@Autowired
@@ -29,13 +34,13 @@ public class EventDistributor {
 			Camera camera1 = cameraRepository.findByName(cameraName1);
 			Camera camera2 = cameraRepository.findByName(cameraName2);
 			
-			event = new EventComplex(new EventSimple(camera1), new EventSimple(camera2));
+			event = new EventComplex(new EventSimple(camera1), new EventSimple(camera2), mensaje);
 			
 			for (int i = 2; i < reglaArray.length; i++) {
 				String cameraName = reglaArray[i];
 				Camera camera = cameraRepository.findByName(cameraName);
 				Event eventSimple = new EventSimple(camera);
-				event = new EventComplex(event, eventSimple);
+				event = new EventComplex(eventSimple, event, mensaje);
 			}
 		}
 		

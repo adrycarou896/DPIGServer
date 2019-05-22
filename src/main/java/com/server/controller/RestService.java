@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.event.Event;
-import com.event.EventDistributor;
 import com.server.model.Camera;
 import com.server.model.Match;
 import com.server.model.Person;
@@ -22,6 +21,7 @@ import com.server.model.dto.PersonDTO;
 import com.server.repository.CameraRepository;
 import com.server.repository.MatchRepository;
 import com.server.repository.PersonRepository;
+import com.server.services.EventDistributor;
 
 @RestController
 @RequestMapping(path = "/sendFrame")//Rura en la que encontramos el servicio
@@ -35,6 +35,9 @@ public class RestService{
 	
 	@Autowired
 	private PersonRepository personRepository;
+	
+	@Autowired
+	private EventDistributor eventDistributor;
 	
 	@RequestMapping(method = RequestMethod.POST, path = "/insertMatch", //dirección del servicio
 			consumes = "application/json", produces = "application/json")
@@ -63,17 +66,18 @@ public class RestService{
 	
 	private void searchPattern(Person person) {
 		String[] reglas = new String[] {"camera1:Está en la clase 1","camera1->camera0:Salió de clase"};
-		EventDistributor eventDistributor = new EventDistributor();
-		List<Event> events = new ArrayList<Event>();
+		List<Match> personMatches = matchRepository.findByPerson(person.getId());
+
+		List<Event> eventsSuccesed = new ArrayList<Event>();
 		for (int i = 0; i < reglas.length; i++) {
 			String regla = reglas[i];
-			Event event = eventDistributor.getEvent(regla);
-			events.add(event);
+			Event event = this.eventDistributor.getEvent(regla);
+			if(event.isSuccesed(personMatches)) {
+				eventsSuccesed.add(event);
+			}
 		}
 		
-		
-		List<Match> personMatches = matchRepository.findByPerson(person.getId());
-		Match ultimateMatch = personMatches.get(0);
+		/*Match ultimateMatch = personMatches.get(0);
 		if(ultimateMatch.getCamera().getName().equals("camera1")) {
 			System.out.println("Está en la clase 1");
 		}
@@ -84,7 +88,7 @@ public class RestService{
 					System.out.println("Salió de clase");
 				}
 			}
-		}
+		}*/
 		//C1 -> C2 -> C3 -> Un evento
 	}
 }
