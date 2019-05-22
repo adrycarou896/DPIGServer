@@ -14,10 +14,12 @@ public class EventSimple implements Event{
 	public EventSimple(Camera camera, String mensaje) {
 		this.camera = camera;
 		this.mensaje = mensaje;
+		this.priority = 1;
 	}
 	
 	public EventSimple(Camera camera) {
 		this.camera = camera;
+		this.priority = 1;
 	}
 	
 	@Override
@@ -25,9 +27,6 @@ public class EventSimple implements Event{
 		if(personMatches.size()>0) {
 			Match ultimateMatch = personMatches.get(0);
 			if(ultimateMatch.getCamera().getName().equals(camera.getName())) {
-				if(mensaje!=null) {
-					System.out.println(mensaje);
-				}
 				return true;
 			}
 		}
@@ -38,4 +37,10 @@ public class EventSimple implements Event{
 	public int getPriority() {
 		return this.priority;
 	}
+
+	@Override
+	public String getMensaje() {
+		return this.mensaje;
+	}
+
 }

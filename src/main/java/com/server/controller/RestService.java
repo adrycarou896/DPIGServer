@@ -65,30 +65,25 @@ public class RestService{
 	}
 	
 	private void searchPattern(Person person) {
-		String[] reglas = new String[] {"camera1:Está en la clase 1","camera1->camera0:Salió de clase"};
+		String[] reglas = new String[] {"camera1:Está en la clase 1","camera1->camera0:Salió de la clase 1"};
 		List<Match> personMatches = matchRepository.findByPerson(person.getId());
 
-		List<Event> eventsSuccesed = new ArrayList<Event>();
+		Event eventSuccesed = null;
 		for (int i = 0; i < reglas.length; i++) {
 			String regla = reglas[i];
 			Event event = this.eventDistributor.getEvent(regla);
 			if(event.isSuccesed(personMatches)) {
-				eventsSuccesed.add(event);
-			}
-		}
-		
-		/*Match ultimateMatch = personMatches.get(0);
-		if(ultimateMatch.getCamera().getName().equals("camera1")) {
-			System.out.println("Está en la clase 1");
-		}
-		else if(ultimateMatch.getCamera().getName().equals("camera0")) {
-			Match penUltimateMatch = personMatches.get(0);
-			if(penUltimateMatch!=null) {
-				if(penUltimateMatch.getCamera().getName().equals("camera1")) {
-					System.out.println("Salió de clase");
+				if(eventSuccesed!=null) {
+					if(event.getPriority()>eventSuccesed.getPriority()) {
+						eventSuccesed = event;
+					}
 				}
+				else {
+					eventSuccesed = event;
+				}
+				
 			}
-		}*/
-		//C1 -> C2 -> C3 -> Un evento
+		}
+		System.out.println(eventSuccesed.getMensaje());
 	}
 }

@@ -16,7 +16,7 @@ public class EventComplex implements Event{
 		this.event1 = event1;
 		this.event2 = event2;
 		this.mensaje = mensaje;
-		this.priority = event1.getPriority()+event2.getPriority();
+		this.priority = this.event1.getPriority()+this.event2.getPriority();
 	}
 
 	public Event getEvent1() {
@@ -39,15 +39,19 @@ public class EventComplex implements Event{
 	public boolean isSuccesed(List<Match> personMatches) {
 		if(this.event1.isSuccesed(personMatches.subList(0, personMatches.size())) &&
 		   this.event2.isSuccesed(personMatches.subList(1, personMatches.size()))){
-			System.out.println(mensaje);	
 			return true;
 		}
 		return false;
 	}
-
+	
 	@Override
 	public int getPriority() {
 		return this.priority;
+	}
+	
+	@Override
+	public String getMensaje() {
+		return this.mensaje;
 	}
 
 }
