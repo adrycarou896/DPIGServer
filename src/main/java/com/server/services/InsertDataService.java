@@ -1,7 +1,14 @@
 package com.server.services;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
@@ -93,6 +100,33 @@ public class InsertDataService {
 			System.out.println("Some rule has an error");
 		}
 		return event;
+	}
+	
+	private void readRulesFile() throws FileNotFoundException, IOException {
+		int ruleNumber=1;
+		try (InputStream input = new FileInputStream("resources/rules.properties")) {
+			Properties prop = new Properties();
+
+            prop.load(input);
+            
+            prop.getProperty("rule"+ruleNumber);
+            
+            ruleNumber++;
+
+		}
+	}
+	
+	private long numberOfLines(String filePath) throws IOException {
+		
+		FileReader fr = new FileReader("fichero.txt");
+		BufferedReader bf = new BufferedReader(fr);
+		long lNumeroLineas = 0;
+		String sCadena = "";
+		while ((sCadena = bf.readLine())!=null) {
+		  lNumeroLineas++;
+		}
+		
+		return lNumeroLineas;
 	}
 	
 	public List<Event> getEvents(){
