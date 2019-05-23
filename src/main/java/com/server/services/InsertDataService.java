@@ -1,14 +1,9 @@
 package com.server.services;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
@@ -22,18 +17,13 @@ import com.server.model.Camera;
 import com.server.model.Person;
 import com.server.repository.CameraRepository;
 import com.server.repository.PersonRepository;
+import com.server.util.ReadRules;
 
 @Service
 public class InsertDataService {
 	
 	private static final int NUM_CAMERAS = 2;
 	private static final int NUM_PERSONS = 3;
-	
-	private String[] reglas = new String[] {
-			"camera0->camera1:Entró en clase 1",
-			"camera1:Está en la clase 1",
-			"camera1->camera0:Salió de la clase 1"
-	};
 	
 	@Autowired
 	private CameraRepository cameraRepository;
@@ -55,13 +45,18 @@ public class InsertDataService {
 		}
 		
 		//GENERAR EVENTOS
-		generateEvents();
+		try {
+			generateEvents();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	private void generateEvents() {
-		for (int i = 0; i < reglas.length; i++) {
-			String regla = reglas[i];
-			Event event = getEvent(regla);
+	private void generateEvents() throws FileNotFoundException, IOException {
+		ReadRules readRules = new ReadRules();
+		List<String> rules = readRules.readRulesFile();
+		for (String rule : rules) {
+			Event event = getEvent(rule);
 			this.events.add(event);
 		}
 	}
@@ -100,33 +95,6 @@ public class InsertDataService {
 			System.out.println("Some rule has an error");
 		}
 		return event;
-	}
-	
-	private void readRulesFile() throws FileNotFoundException, IOException {
-		int ruleNumber=1;
-		try (InputStream input = new FileInputStream("resources/rules.properties")) {
-			Properties prop = new Properties();
-
-            prop.load(input);
-            
-            prop.getProperty("rule"+ruleNumber);
-            
-            ruleNumber++;
-
-		}
-	}
-	
-	private long numberOfLines(String filePath) throws IOException {
-		
-		FileReader fr = new FileReader("fichero.txt");
-		BufferedReader bf = new BufferedReader(fr);
-		long lNumeroLineas = 0;
-		String sCadena = "";
-		while ((sCadena = bf.readLine())!=null) {
-		  lNumeroLineas++;
-		}
-		
-		return lNumeroLineas;
 	}
 	
 	public List<Event> getEvents(){
