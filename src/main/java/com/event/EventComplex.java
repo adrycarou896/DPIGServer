@@ -1,5 +1,6 @@
 package com.event;
 
+import java.util.Date;
 import java.util.List;
 
 import com.server.model.Match;
@@ -11,6 +12,7 @@ public class EventComplex implements Event{
 	private Event event1, event2;
 	
 	private String mensaje;
+	private Date date;
 	
 	public EventComplex(Event event1, Event event2, String mensaje) {
 		this.event1 = event1;
@@ -37,8 +39,9 @@ public class EventComplex implements Event{
 
 	@Override
 	public boolean isSuccesed(List<Match> personMatches) {
-		if(this.event1.isSuccesed(personMatches.subList(0, personMatches.size())) &&
-		   this.event2.isSuccesed(personMatches.subList(1, personMatches.size()))){
+		if(this.event1.isSuccesed(personMatches.subList(1, personMatches.size())) &&
+		   this.event2.isSuccesed(personMatches.subList(0, personMatches.size()))){
+			this.date = this.event2.getDate();
 			return true;
 		}
 		return false;
@@ -52,6 +55,16 @@ public class EventComplex implements Event{
 	@Override
 	public String getMensaje() {
 		return this.mensaje;
+	}
+	
+	@Override
+	public Date getDate() {
+		return this.date;
+	}
+	
+	@Override
+	public String toString() {
+		return mensaje;
 	}
 
 }

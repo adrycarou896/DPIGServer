@@ -21,7 +21,7 @@ import com.server.model.dto.PersonDTO;
 import com.server.repository.CameraRepository;
 import com.server.repository.MatchRepository;
 import com.server.repository.PersonRepository;
-import com.server.services.EventDistributor;
+import com.server.services.InsertDataService;
 
 @RestController
 @RequestMapping(path = "/sendFrame")//Rura en la que encontramos el servicio
@@ -37,7 +37,7 @@ public class RestService{
 	private PersonRepository personRepository;
 	
 	@Autowired
-	private EventDistributor eventDistributor;
+	private InsertDataService insertDataService;
 	
 	@RequestMapping(method = RequestMethod.POST, path = "/insertMatch", //dirección del servicio
 			consumes = "application/json", produces = "application/json")
@@ -65,25 +65,35 @@ public class RestService{
 	}
 	
 	private void searchPattern(Person person) {
-		String[] reglas = new String[] {"camera1:Está en la clase 1","camera1->camera0:Salió de la clase 1"};
 		List<Match> personMatches = matchRepository.findByPerson(person.getId());
-
-		Event eventSuccesed = null;
-		for (int i = 0; i < reglas.length; i++) {
-			String regla = reglas[i];
-			Event event = this.eventDistributor.getEvent(regla);
-			if(event.isSuccesed(personMatches)) {
-				if(eventSuccesed!=null) {
-					if(event.getPriority()>eventSuccesed.getPriority()) {
-						eventSuccesed = event;
+		
+		List<Event> eventsSuccesed = new ArrayList<Event>();
+		for (Event event : insertDataService.getEvents()) {
+			if(event!=null) {
+				if(event.isSuccesed(personMatches)) {
+					if(eventsSuccesed.size()>0) {
+						Event firstEvent = eventsSuccesed.get(0);
+						if(event.getDate().after(firstEvent.getDate())) {
+							eventsSuccesed.set(0, event);
+						}
+						else if(event.getDate().equals(firstEvent.getDate())) {
+							eventsSuccesed.add(event);
+						}
+					}
+					else {
+						eventsSuccesed.add(event);
 					}
 				}
-				else {
-					eventSuccesed = event;
-				}
-				
 			}
 		}
-		System.out.println(eventSuccesed.getMensaje());
+	
+		for (Event event : eventsSuccesed) {
+			System.out.println(person.getName()+" -> "+event);
+		}
+		
 	}
+	
+	//if(event.getPriority()>eventSuccesed.getPriority()) {
+	//eventSuccesed = event;
+	//}
 }
