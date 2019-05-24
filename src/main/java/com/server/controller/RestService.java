@@ -68,19 +68,17 @@ public class RestService{
 		List<Match> personMatches = matchRepository.findByPerson(person.getId());
 		
 		List<Event> eventsSuccesed = new ArrayList<Event>();
+		Event firstEvent = null;
 		for (Event event : insertDataService.getEvents()) {
 			if(event!=null) {
 				if(event.isSuccesed(personMatches)) {
-					if(eventsSuccesed.size()>0) {
-						Event firstEvent = eventsSuccesed.get(0);
-						if(event.getDate().after(firstEvent.getDate())) {
-							eventsSuccesed.set(0, event);
-						}
-						else if(event.getDate().equals(firstEvent.getDate())) {
-							eventsSuccesed.add(event);
-						}
+					if (firstEvent == null || event.getDate().equals(firstEvent.getDate())) {
+						firstEvent = event;
+						eventsSuccesed.add(event);
 					}
-					else {
+					else if(event.getDate().after(firstEvent.getDate())) {
+						firstEvent = event;
+						eventsSuccesed.clear();
 						eventsSuccesed.add(event);
 					}
 				}

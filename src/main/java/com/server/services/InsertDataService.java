@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.event.Event;
@@ -20,6 +21,7 @@ import com.server.repository.PersonRepository;
 import com.server.util.ReadRules;
 
 @Service
+@Scope("singleton")
 public class InsertDataService {
 	
 	private static final int NUM_CAMERAS = 2;
