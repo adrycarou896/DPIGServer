@@ -1,18 +1,17 @@
 package com.server.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.json.JSONObject;
+
 @Entity
-//@Immutable
 @Table(name="cameras")
 public class Camera implements Serializable {
 	
@@ -25,8 +24,8 @@ public class Camera implements Serializable {
 	 @Column(unique=true)
 	 private String name;
 	 
-	 @ManyToMany
-	 private List<Camera> observers;
+	 //@ManyToMany
+	 //private List<Camera> observers;
 	 
 	 public Camera() {}
 	 
@@ -34,10 +33,10 @@ public class Camera implements Serializable {
 		 this.name = name;
 	 }
 	 
-	 public Camera(String name, List<Camera> observers) {
+	 /*public Camera(String name, List<Camera> observers) {
 		 this.name = name;
 		 this.observers = observers;
-	 }
+	 }*/
 
 	public String getName() {
 		return name;
@@ -49,6 +48,13 @@ public class Camera implements Serializable {
 	
 	public Long getId() {
 		return this.id;
+	}
+	
+	public JSONObject getJson() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("id", this.id);
+		jsonObject.put("name", this.name);
+		return jsonObject;
 	}
 	 
 	 

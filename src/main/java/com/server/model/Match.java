@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.json.JSONObject;
+
 @Entity
 @Table(name="matches")
 public class Match implements Serializable {
@@ -63,6 +65,14 @@ public class Match implements Serializable {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	
+	public JSONObject getJson() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("camera", this.camera.getJson());
+		jsonObject.put("person", this.person.getJson());
+		jsonObject.put("date", this.date.getTime());
+		return jsonObject;
 	}
 	
 }

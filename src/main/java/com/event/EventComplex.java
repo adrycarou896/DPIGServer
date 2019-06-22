@@ -1,16 +1,19 @@
 package com.event;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONObject;
+
 import com.server.model.Match;
 
-public class EventComplex implements Event{
-	
+public class EventComplex implements Event,Serializable{
+
+	private static final long serialVersionUID = 6161696925923575356L;
+
 	private int priority;
-	
 	private Event event1, event2;
-	
 	private String mensaje;
 	private Date date;
 	
@@ -65,6 +68,14 @@ public class EventComplex implements Event{
 	@Override
 	public String toString() {
 		return mensaje;
+	}
+
+	@Override
+	public JSONObject getJson() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("mensaje", mensaje);
+		jsonObject.put("date", date.getTime());
+		return jsonObject;
 	}
 
 }

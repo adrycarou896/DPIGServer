@@ -1,13 +1,8 @@
 package com.server.controller;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.event.Event;
+import com.server.eventsserver.IEventsServer;
 import com.server.model.Camera;
 import com.server.model.Match;
 import com.server.model.Person;
@@ -43,6 +39,9 @@ public class RestService{
 	
 	@Autowired
 	private InsertDataService insertDataService;
+	
+	@Autowired
+	private IEventsServer eventServer;
 	
 	@RequestMapping(method = RequestMethod.POST, path = "/insertMatch", //dirección del servicio
 			consumes = "application/json", produces = "application/json")
@@ -92,18 +91,7 @@ public class RestService{
 	
 		for (Event event : eventsSuccesed) {
 			System.out.println(person.getName()+" -> "+event);
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("event", event);
-			data.put("person", person);
-			
-			try {
-				Socket s = new Socket("localhost", 4999);
-				
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			eventServer.saveData(person,event);	
 		}
 		
 	}

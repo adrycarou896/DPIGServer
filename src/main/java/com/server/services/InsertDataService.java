@@ -38,7 +38,8 @@ public class InsertDataService {
 	@PostConstruct
 	public void init() {
 		for (int i = 0; i < NUM_CAMERAS; i++) {
-			Camera camera = new Camera("camera"+i,new ArrayList<>());
+			//Camera camera = new Camera("camera"+i,new ArrayList<>());
+			Camera camera = new Camera("camera"+i);
 			cameraRepository.save(camera);
 		}
 		for (int i = 0; i < NUM_PERSONS; i++) {

@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.json.JSONObject;
+
 @Entity
 @Table(name="persons")
 public class Person implements Serializable {
@@ -41,6 +43,13 @@ public class Person implements Serializable {
 	
 	public Long getId() {
 		return this.id;
+	}
+	
+	public JSONObject getJson() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("name", this.id);
+		jsonObject.put("name", this.name);
+		return jsonObject;
 	}
 
 }

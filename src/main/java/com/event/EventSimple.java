@@ -1,12 +1,17 @@
 package com.event;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
+import org.json.JSONObject;
 
 import com.server.model.Camera;
 import com.server.model.Match;
 
-public class EventSimple implements Event{
+public class EventSimple implements Event,Serializable{
+
+	private static final long serialVersionUID = 7630199873467233523L;
 	
 	private int priority;
 	private Camera camera;
@@ -55,5 +60,12 @@ public class EventSimple implements Event{
 	public String toString() {
 		return mensaje;
 	}
-
+	
+	@Override
+	public JSONObject getJson() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("mensaje", mensaje);
+		jsonObject.put("date", date.getTime());
+		return jsonObject;
+	}
 }
