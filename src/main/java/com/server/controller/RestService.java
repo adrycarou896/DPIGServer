@@ -2,7 +2,9 @@ package com.server.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +44,8 @@ public class RestService{
 	
 	@Autowired
 	private IEventsServer eventServer;
+	
+	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
 	
 	@RequestMapping(method = RequestMethod.POST, path = "/insertMatch", //dirección del servicio
 			consumes = "application/json", produces = "application/json")
@@ -88,10 +92,26 @@ public class RestService{
 				}
 			}
 		}
-	
+		
 		for (Event event : eventsSuccesed) {
 			System.out.println(person.getName()+" -> "+event);
-			eventServer.saveData(person,event);	
+			List<Event> personEventsSaved = this.lastEventPersons.get(person.getName());
+			if(personEventsSaved!=null){
+				if(!personEventsSaved.contains(event)){
+					if(event.getDate().before(personEventsSaved.get(0).getDate())){
+						personEventsSaved.clear();
+					}
+					personEventsSaved.add(event);
+					eventServer.saveData(person,event);	
+				}
+			}
+			else{
+				personEventsSaved = new ArrayList<Event>();
+				personEventsSaved.add(event);
+				
+				this.lastEventPersons.put(person.getName(), personEventsSaved);
+				eventServer.saveData(person,event);	
+			}
 		}
 		
 	}
