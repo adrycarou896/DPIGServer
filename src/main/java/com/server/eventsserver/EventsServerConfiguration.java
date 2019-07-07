@@ -1,6 +1,5 @@
 package com.server.eventsserver;
 
-import org.omg.CORBA.OMGVMCID;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
