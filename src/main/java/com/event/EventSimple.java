@@ -17,6 +17,7 @@ public class EventSimple implements Event,Serializable{
 	private Camera camera;
 	private String mensaje;
 	private Date date;
+	private String name;
 	
 	public EventSimple(Camera camera, String mensaje) {
 		this.camera = camera;
@@ -67,5 +68,15 @@ public class EventSimple implements Event,Serializable{
 		jsonObject.put("mensaje", mensaje);
 		jsonObject.put("date", date.getTime());
 		return jsonObject;
+	}
+	
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name=name;
 	}
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alert.Alert;
 import com.event.Event;
 import com.server.eventsserver.IEventsServer;
 import com.server.model.Camera;
@@ -112,7 +113,13 @@ public class RestService{
 				this.lastEventPersons.put(person.getName(), personEventsSaved);
 				eventServer.saveData(person,event);	
 			}
+			
+			List<Alert> eventAlerts = insertDataService.getAlertByEvent(event);
+			for (Alert alert : eventAlerts) {
+				System.out.println("Alert->"+alert.getName());
+			}
 		}
+		
 		
 	}
 	

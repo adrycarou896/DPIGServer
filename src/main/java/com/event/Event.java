@@ -8,6 +8,9 @@ import org.json.JSONObject;
 import com.server.model.Match;
 
 public interface Event{
+	public String getName();
+	public void setName(String name);
+	
 	public boolean isSuccesed(List<Match> personMatches);
 	public int getPriority();
 	public String getMensaje();

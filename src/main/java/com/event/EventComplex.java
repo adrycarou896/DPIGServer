@@ -16,6 +16,7 @@ public class EventComplex implements Event,Serializable{
 	private Event event1, event2;
 	private String mensaje;
 	private Date date;
+	private String name;
 	
 	public EventComplex(Event event1, Event event2, String mensaje) {
 		this.event1 = event1;
@@ -76,6 +77,16 @@ public class EventComplex implements Event,Serializable{
 		jsonObject.put("mensaje", mensaje);
 		jsonObject.put("date", date.getTime());
 		return jsonObject;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name=name;
 	}
 
 }
