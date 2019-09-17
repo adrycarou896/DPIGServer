@@ -24,6 +24,7 @@ import com.server.model.Person;
 import com.server.repository.CameraRepository;
 import com.server.repository.PersonRepository;
 import com.server.util.ReadProperties;
+import com.server.util.reconocimiento.Entrenar;
 
 @Service
 @Scope("singleton")
@@ -40,12 +41,15 @@ public class InsertDataService {
 	private List<Event> events = new ArrayList<Event>();
 	private List<Alert> alerts = new ArrayList<Alert>();
 	
+	private Entrenar train;
+		  
 	@PostConstruct
 	public void init() {
 		
 		ReadProperties properties = new ReadProperties();
 		Map<String, Object> data=null;
 		try {
+			
 			data = properties.readPropertiesFile();
 			int numCamaras = (int)(data.get("cameras"));
 			
@@ -58,14 +62,25 @@ public class InsertDataService {
 				personRepository.save(person);
 			}
 			
-			//GENERAR EVENTOS
+			//GENERAR EVENTOS Y ALERTAS (REGLAS)
 			generateEvents(data);
 			generateAlerts(data);
+			
+			//REALIZAR ENTRENAMIENTO CON LAS IMÁGENES DE LOS USUARIOS
+			Entrenar train = train();
+			this.train = train;
+			
 			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		
+	}
+	
+	private Entrenar train(){
+		Entrenar train = new Entrenar();
+		train.run();
+		return train;
 	}
 	
 	private void generateEvents(Map<String,Object> data){
@@ -188,5 +203,9 @@ public class InsertDataService {
 	
 	public List<Alert> getAlerts(){
 		return this.alerts;
+	}
+	
+	public Entrenar getTrain(){
+		return this.train;
 	}
 }
