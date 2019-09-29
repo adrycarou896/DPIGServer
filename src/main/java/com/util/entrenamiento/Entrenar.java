@@ -36,6 +36,8 @@ public class Entrenar implements Runnable{
 		}
 		
 		train(trainingDirs);
+		
+		System.out.println("Entrenamiento realizado");
 	}
 	
 	public void train(String[] trainingDirs) { 

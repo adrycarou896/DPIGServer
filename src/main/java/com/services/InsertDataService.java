@@ -64,7 +64,6 @@ public class InsertDataService {
 			generateEvents(data);
 			generateAlerts(data);
 			
-			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

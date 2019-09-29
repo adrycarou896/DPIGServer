@@ -1,5 +1,6 @@
 package com.configuration;
 
+import org.opencv.core.Core;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,8 @@ public class EventsServerConfiguration {
 			}
 		};
 	}
-
+	
+	
 	@Bean
 	public CommandLineRunner schedulingRunner(TaskExecutor executor) {
 	    return new CommandLineRunner() {
@@ -36,6 +38,8 @@ public class EventsServerConfiguration {
 	            executor.execute(new Runnable() {
 					@Override
 					public void run() {
+						System.load("C:\\opencv\\build\\java\\x64\\opencv_java400.dll");
+						
 						Entrenar train = new Entrenar();
 						train.run();
 						IPCameraRecord ipCameraRecord = new IPCameraRecord(new IPCamera(), train);
