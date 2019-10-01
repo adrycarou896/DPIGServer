@@ -38,7 +38,7 @@ public class IPCameraRecord implements Runnable{
 			
 			String imageUrl = ipCamera.getDeviceURLImage(deviceId);
 		    String destinationFile = "img/actualImage.jpg";
-			ipCamera.saveImage(imageUrl, destinationFile);
+			ipCamera.saveFile(imageUrl, destinationFile);
 			
 			Mat frame = getImageMat(imageUrl);
 			Mat frame_gray = new Mat();

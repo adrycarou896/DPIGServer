@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.model.Camera;
 import com.model.Match;
@@ -19,6 +20,7 @@ import com.repository.PersonRepository;
 import com.services.InsertDataService;
 import com.util.eventsserver.IEventsServer;
 
+@Service
 public class PatternsManager {
 	
 	@Autowired
@@ -46,8 +48,8 @@ public class PatternsManager {
 	
 	private Match saveMatch(long cameraId, long personId, Date date){
 		
-		String cameraName = "camera" + cameraId;
-	    String personName = "person"+ personId;
+		String cameraName = "camera" + (cameraId-1);
+	    String personName = "person"+ (personId-1);
 	    
 	    Camera camera = cameraRepository.findByName(cameraName);
 		Person person = personRepository.findByName(personName);

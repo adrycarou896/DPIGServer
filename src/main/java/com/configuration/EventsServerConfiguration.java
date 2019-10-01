@@ -1,6 +1,6 @@
 package com.configuration;
 
-import org.opencv.core.Core;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,12 +9,16 @@ import org.springframework.core.task.TaskExecutor;
 
 import com.util.entrenamiento.Entrenar;
 import com.util.eventsserver.IEventsServer;
+import com.util.patterns.PatternsManager;
 import com.util.smarthings.IPCamera;
 import com.util.smarthings.IPCameraRecord;
 
 @Configuration
 public class EventsServerConfiguration {
-
+	
+	@Autowired
+	private PatternsManager patternsManager;
+	
 	@Bean
 	public TaskExecutor createTaskExecutor() {
 		return new SimpleAsyncTaskExecutor();
@@ -56,6 +60,7 @@ public class EventsServerConfiguration {
 								e.printStackTrace();
 							}
 						}
+						
 					}
 				});
 	        }
