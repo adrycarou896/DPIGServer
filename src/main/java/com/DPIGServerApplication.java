@@ -9,7 +9,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.util.smarthings.CaptureVideoFrameOption3;
+import com.util.smarthings.CaptureVideoFramesOption2;
+import com.util.smarthings.CaptureVideoFramesOption4;
 import com.util.smarthings.IPCamera;
+import com.xuggle.xuggler.demos.DecodeAndCaptureFrames;
 
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -18,6 +22,7 @@ public class DPIGServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DPIGServerApplication.class, args);
 		
+		/*
 		try {
 		    Loader.load(FFmpegFrameGrabber.class);
 		} catch (UnsatisfiedLinkError e) {
@@ -34,7 +39,7 @@ public class DPIGServerApplication {
 				e1.printStackTrace();
 			}
 		  
-		}
+		}*/
 		
 		IPCamera ipCamera = new IPCamera();
 		
@@ -43,8 +48,14 @@ public class DPIGServerApplication {
 			devices = ipCamera.getDevices();
 			String deviceId = ipCamera.getDeviceId(devices);
 			
-			ipCamera.getVideoImages(deviceId);
+			//ipCamera.getVideoImages(deviceId);
+
+			//new CaptureVideoFramesOption2().getVideoFrames();
 			
+			//new CaptureVideoFrameOption3().run();
+			
+			//String videoURL = ipCamera.getVideoURL(deviceId);
+			new CaptureVideoFramesOption4().getVideoImage();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
