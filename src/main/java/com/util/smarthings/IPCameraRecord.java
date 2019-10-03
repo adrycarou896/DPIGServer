@@ -59,7 +59,8 @@ public class IPCameraRecord implements Runnable{
 		    buffer.write(data, 0, nRead);
 		}
 		byte[] bytes = buffer.toByteArray();
-		Mat mat = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+		//Mat mat = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+		Mat mat = Imgcodecs.imdecode(new MatOfByte(bytes), -1);
 		return mat;
 	}
 	

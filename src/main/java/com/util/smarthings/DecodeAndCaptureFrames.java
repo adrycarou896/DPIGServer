@@ -16,6 +16,7 @@ public class DecodeAndCaptureFrames extends MediaListenerAdapter
 	  private boolean gotFirst = false;
 	  private String saveFile;
 	  private Exception e;
+	  private int cont = 0;
 	  /** Construct a DecodeAndCaptureFrames which reads and captures
 	   * frames from a video file.
 	   * 
@@ -83,8 +84,9 @@ public class DecodeAndCaptureFrames extends MediaListenerAdapter
 	          return;
 	      }
 
-	      ImageIO.write(event.getImage(), "jpg", new File(saveFile));
-	      gotFirst = true;
+	      ImageIO.write(event.getImage(), "jpg", new File(saveFile + cont + ".jpg"));
+	      cont++;
+	      //gotFirst = true;
 
 	    }
 	    catch (Exception e)

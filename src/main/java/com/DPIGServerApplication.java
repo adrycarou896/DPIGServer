@@ -12,8 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.util.smarthings.CaptureVideoFrameOption3;
 import com.util.smarthings.CaptureVideoFramesOption2;
 import com.util.smarthings.CaptureVideoFramesOption4;
+import com.util.smarthings.DecodeAndCaptureFrames;
 import com.util.smarthings.IPCamera;
-import com.xuggle.xuggler.demos.DecodeAndCaptureFrames;
 
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -49,13 +49,17 @@ public class DPIGServerApplication {
 			String deviceId = ipCamera.getDeviceId(devices);
 			
 			//ipCamera.getVideoImages(deviceId);
-
+			try {
+				new DecodeAndCaptureFrames("img/video.mp4","img/videoFrames/");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			//new CaptureVideoFramesOption2().getVideoFrames();
 			
 			//new CaptureVideoFrameOption3().run();
 			
 			//String videoURL = ipCamera.getVideoURL(deviceId);
-			new CaptureVideoFramesOption4().getVideoImage();
+			//new CaptureVideoFramesOption4().getVideoImage();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
