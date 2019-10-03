@@ -1,6 +1,5 @@
 package com.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,15 +8,11 @@ import org.springframework.core.task.TaskExecutor;
 
 import com.util.entrenamiento.Entrenar;
 import com.util.eventsserver.IEventsServer;
-import com.util.patterns.PatternsManager;
-import com.util.smarthings.IPCamera;
-import com.util.smarthings.IPCameraRecord;
+import com.util.smarthings.IPCamerasManager;
+import com.util.smarthings.IPCamerasRecord;
 
 @Configuration
 public class EventsServerConfiguration {
-	
-	@Autowired
-	private PatternsManager patternsManager;
 	
 	@Bean
 	public TaskExecutor createTaskExecutor() {
@@ -46,13 +41,15 @@ public class EventsServerConfiguration {
 						
 						Entrenar train = new Entrenar();
 						train.run();
-						IPCameraRecord ipCameraRecord = new IPCameraRecord(new IPCamera(), train);
+						
+						IPCamerasManager ipCamerasManager = new IPCamerasManager();
+						IPCamerasRecord ipCamerasRecord = new IPCamerasRecord(ipCamerasManager, train);
 						while (true) {
 							//Hacerlo todo en servidor
 							//hacer pruebas de usuario através de peticiones web a este servidor
 							//hacer lo de asignar cámaras de smarthings con las de mi .properties
 							
-							ipCameraRecord.run();
+							ipCamerasRecord.run();
 							
 							try {
 								Thread.sleep(1000);

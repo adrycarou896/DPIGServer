@@ -1,9 +1,8 @@
 package com.util.smarthings;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-
-import javax.imageio.ImageIO;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.xuggle.mediatool.IMediaReader;
 import com.xuggle.mediatool.MediaListenerAdapter;
@@ -14,19 +13,20 @@ public class DecodeAndCaptureFrames extends MediaListenerAdapter
 {
 	  private int mVideoStreamIndex = -1;
 	  private boolean gotFirst = false;
-	  private String saveFile;
 	  private Exception e;
 	  private int cont = 0;
+	  private List<BufferedImage> images;
 	  /** Construct a DecodeAndCaptureFrames which reads and captures
 	   * frames from a video file.
 	   * 
 	   * @param filename the name of the media file to read
 	   */
 
-	  public DecodeAndCaptureFrames(String videoFile, String saveFile)throws Exception
+	  public DecodeAndCaptureFrames(String videoFile)throws Exception
 	  {
+		 this.images = new ArrayList<BufferedImage>();
+		  
 	    // create a media reader for processing video
-	    this.saveFile = saveFile;
 	    this.e = null;
 	     IMediaReader reader = ToolFactory.makeReader(videoFile);
 
@@ -83,9 +83,10 @@ public class DecodeAndCaptureFrames extends MediaListenerAdapter
 	        else
 	          return;
 	      }
-
-	      ImageIO.write(event.getImage(), "jpg", new File(saveFile + cont + ".jpg"));
-	      cont++;
+	      
+	      this.images.add(event.getImage());
+	      //ImageIO.write(event.getImage(), "jpg", new File(saveFile + cont + ".jpg"));
+	      this.cont++;
 	      //gotFirst = true;
 
 	    }
@@ -93,5 +94,9 @@ public class DecodeAndCaptureFrames extends MediaListenerAdapter
 	    {
 	      this.e = e;
 	    }
+	  }
+	  
+	  public List<BufferedImage> getImages(){
+		  return this.images;
 	  }
 }

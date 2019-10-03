@@ -26,6 +26,7 @@ import org.opencv.objdetect.CascadeClassifier;
 
 import com.util.entrenamiento.Entrenar;
 import com.util.patterns.PatternsManager;
+import com.util.smarthings.IPCamera;
 
 public class ReconocimientoFacial {
 	 
@@ -42,8 +43,7 @@ public class ReconocimientoFacial {
     //Nuevo
     //private Server server;
     private long cameraId = 1;
-    
-    
+     
     public ReconocimientoFacial(){
     	this.Cascade = new CascadeClassifier(RutaDelCascade);
     	this.rostros = new MatOfRect();
@@ -61,7 +61,7 @@ public class ReconocimientoFacial {
     	this.patternsManager = new PatternsManager();
     }
     
-    public void reconocer(Mat frame, Mat frame_gray) throws Exception{
+    public void reconocer(IPCamera device, Mat frame, Mat frame_gray) throws Exception{
 		
 		Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
         Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
