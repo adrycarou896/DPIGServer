@@ -29,9 +29,6 @@ public class ReadProperties {
 			Properties prop = new Properties();
             prop.load(input);
             
-            int numCameras = Integer.parseInt(prop.getProperty("cameras"));
-            data.put("cameras", numCameras);
-            
             for (int i = 1; i <= totalProperties; i++) {
             	String propertyName = "event"+i;
    			 	String event = prop.getProperty(propertyName);

@@ -12,21 +12,21 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.model.IPCamera;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class IPCamerasManager {
 	
-	private List<IPCamera> devices;
-	
-	public IPCamerasManager(){
-		
+	public List<IPCamera> findDevices(){
 		try {
-			this.devices = getDevices(getJSONDevices());
+			return getDevices(getJSONDevices());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	public void saveFile(String fileUrl, String destinationFile) throws IOException {
@@ -116,9 +116,5 @@ public class IPCamerasManager {
 		}
 		return null;
 		
-	}
-
-	public List<IPCamera> getDevices() {
-		return devices;
 	}
 }

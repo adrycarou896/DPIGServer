@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import com.model.Camera;
+import com.model.IPCamera;
 import com.model.Match;
 
 public class EventSimple implements Event,Serializable{
@@ -14,19 +14,19 @@ public class EventSimple implements Event,Serializable{
 	private static final long serialVersionUID = 7630199873467233523L;
 	
 	private int priority;
-	private Camera camera;
+	private IPCamera ipCamera;
 	private String mensaje;
 	private Date date;
 	private String name;
 	
-	public EventSimple(Camera camera, String mensaje) {
-		this.camera = camera;
+	public EventSimple(IPCamera ipCamera, String mensaje) {
+		this.ipCamera = ipCamera;
 		this.mensaje = mensaje;
 		this.priority = 1;
 	}
 	
-	public EventSimple(Camera camera) {
-		this.camera = camera;
+	public EventSimple(IPCamera ipCamera) {
+		this.ipCamera = ipCamera;
 		this.priority = 1;
 	}
 	
@@ -35,7 +35,7 @@ public class EventSimple implements Event,Serializable{
 		if(personMatches.size()>0) {
 			this.date = personMatches.get(0).getDate();
 			Match ultimateMatch = personMatches.get(0);
-			if(ultimateMatch.getCamera().getName().equals(camera.getName())) {
+			if(ultimateMatch.getIpCamera().getName().equals(ipCamera.getName())) {
 				return true;
 			}
 		}

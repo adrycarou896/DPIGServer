@@ -15,16 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.model.Camera;
+import com.model.IPCamera;
 import com.model.Person;
 import com.model.alert.Alert;
 import com.model.event.Event;
 import com.model.event.EventComplex;
 import com.model.event.EventSimple;
-import com.repository.CameraRepository;
+import com.repository.IPCameraRepository;
 import com.repository.PersonRepository;
 import com.util.ReadProperties;
-import com.util.entrenamiento.Entrenar;
+import com.util.smarthings.IPCamerasManager;
 
 @Service
 @Scope("singleton")
@@ -33,7 +33,7 @@ public class InsertDataService {
 	private static final int NUM_PERSONS = 3;
 	
 	@Autowired
-	private CameraRepository cameraRepository;
+	private IPCameraRepository ipCameraRepository;
 	
 	@Autowired
 	private PersonRepository personRepository;
@@ -48,18 +48,19 @@ public class InsertDataService {
 		Map<String, Object> data=null;
 		try {
 			
-			data = properties.readPropertiesFile();
-			int numCamaras = (int)(data.get("cameras"));
+			IPCamerasManager ipCamerasManager = new IPCamerasManager();
 			
-			for (int i = 0; i < numCamaras; i++) {
-				Camera camera = new Camera("camera"+i);
-				cameraRepository.save(camera);
+			List<IPCamera> devices = ipCamerasManager.findDevices();
+			for (IPCamera device : devices) {
+				ipCameraRepository.save(device);
 			}
+			
 			for (int i = 0; i < NUM_PERSONS; i++) {
 				Person person = new Person("person"+i);
 				personRepository.save(person);
 			}
 			
+			data = properties.readPropertiesFile();
 			//GENERAR EVENTOS Y ALERTAS (REGLAS)
 			generateEvents(data);
 			generateAlerts(data);
@@ -92,22 +93,22 @@ public class InsertDataService {
 			
 			if(!regla.contains("->")) {//camera1:Ha entrado dentro de clase
 				String cameraName = regla;
-				Camera camera = cameraRepository.findByName(cameraName);
-				event = new EventSimple(camera, mensaje);
+				IPCamera ipCamera = ipCameraRepository.findByName(cameraName);
+				event = new EventSimple(ipCamera, mensaje);
 			}
 			else {
 				String[] reglaArray = regla.split("->");
 				String cameraName1 = reglaArray[0];
 				String cameraName2 = reglaArray[1];
 				
-				Camera camera1 = cameraRepository.findByName(cameraName1);
-				Camera camera2 = cameraRepository.findByName(cameraName2);
+				IPCamera ipCamera1 = ipCameraRepository.findByName(cameraName1);
+				IPCamera ipCamera2 = ipCameraRepository.findByName(cameraName2);
 				
-				event = new EventComplex(new EventSimple(camera1), new EventSimple(camera2), mensaje);
+				event = new EventComplex(new EventSimple(ipCamera1), new EventSimple(ipCamera2), mensaje);
 				
 				for (int i = 2; i < reglaArray.length; i++) {
 					String cameraName = reglaArray[i];
-					Camera camera = cameraRepository.findByName(cameraName);
+					IPCamera camera = ipCameraRepository.findByName(cameraName);
 					Event eventSimple = new EventSimple(camera);
 					event = new EventComplex(event, eventSimple, mensaje);
 				}

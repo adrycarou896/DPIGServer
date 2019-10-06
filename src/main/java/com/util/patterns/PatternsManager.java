@@ -9,12 +9,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.model.Camera;
+import com.model.IPCamera;
 import com.model.Match;
 import com.model.Person;
 import com.model.alert.Alert;
 import com.model.event.Event;
-import com.repository.CameraRepository;
+import com.repository.IPCameraRepository;
 import com.repository.MatchRepository;
 import com.repository.PersonRepository;
 import com.services.InsertDataService;
@@ -24,10 +24,10 @@ import com.util.eventsserver.IEventsServer;
 public class PatternsManager {
 	
 	@Autowired
-	private MatchRepository matchRepository;
+	private IPCameraRepository ipCameraRepository;
 	
 	@Autowired
-	private CameraRepository cameraRepository;
+	private MatchRepository matchRepository;
 	
 	@Autowired
 	private PersonRepository personRepository;
@@ -40,25 +40,24 @@ public class PatternsManager {
 	
 	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
 	
-	public void find(long cameraId, long personId, Date fecha){
+	public void find(IPCamera ipCamera, long personId, Date fecha){
 		
-		Match match = saveMatch(cameraId, personId, fecha);
+		Match match = saveMatch(ipCamera.getName(), personId, fecha);
 		searchPattern(match.getPerson());
 	}
 	
-	private Match saveMatch(long cameraId, long personId, Date date){
+	private Match saveMatch(String ipCameraName, long personId, Date date){
 		
-		String cameraName = "camera" + (cameraId-1);
-	    String personName = "person"+ (personId-1);
-	    
-	    Camera camera = cameraRepository.findByName(cameraName);
+	    String personName = "person"+ personId;
+	    System.out.println("PERSON NAME -> "+personName);
 		Person person = personRepository.findByName(personName);
-
-		Match match = new Match(camera, person, date);
 		
-		Match macthFind = matchRepository.findByCameraPerson(camera.getId(), person.getId());
+		IPCamera ipCamera = ipCameraRepository.findByName(ipCameraName);
+		Match match = new Match(ipCamera, person, date);
+		
+		Match macthFind = matchRepository.findByCameraPerson(ipCamera.getId(), person.getId());
 		if(macthFind!=null) {
-			matchRepository.updateMatch(date, camera.getId(), person.getId());
+			matchRepository.updateMatch(date, ipCamera.getId(), person.getId());
 		}
 		else {
 			matchRepository.save(match);

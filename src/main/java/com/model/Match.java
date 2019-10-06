@@ -3,7 +3,6 @@ package com.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,8 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.json.JSONObject;
 
 @Entity
 @Table(name="matches")
@@ -26,7 +23,7 @@ public class Match implements Serializable {
 	private Long id;
 	
 	@ManyToOne
-	private Camera camera;
+	private IPCamera ipCamera;
 	
 	@ManyToOne
 	private Person person;
@@ -36,8 +33,8 @@ public class Match implements Serializable {
 	
 	public Match() {}
 	
-	public Match(Camera camera, Person person, Date date) {
-		this.camera = camera;
+	public Match(IPCamera ipCamera, Person person, Date date) {
+		this.ipCamera = ipCamera;
 		this.person = person;
 		this.date = date;
 		//java.sql.Date date2 = new java.sql.Date(d.getTime());	
@@ -51,12 +48,12 @@ public class Match implements Serializable {
 		this.person = person;
 	}
 
-	public Camera getCamera() {
-		return camera;
+	public IPCamera getIpCamera() {
+		return ipCamera;
 	}
 
-	public void setCamera(Camera camera) {
-		this.camera = camera;
+	public void setCamera(IPCamera ipCamera) {
+		this.ipCamera = ipCamera;
 	}
 
 	public Date getDate() {
@@ -67,6 +64,7 @@ public class Match implements Serializable {
 		this.date = date;
 	}
 	
+	/*
 	public JSONObject getJson() {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("camera", this.camera.getJson());
@@ -74,5 +72,5 @@ public class Match implements Serializable {
 		jsonObject.put("date", this.date.getTime());
 		return jsonObject;
 	}
-	
+	*/
 }
