@@ -42,17 +42,17 @@ public class PatternsManager {
 	
 	public void find(IPCamera ipCamera, long personId, Date fecha){
 		
-		Match match = saveMatch(ipCamera.getName(), personId, fecha);
+		Match match = saveMatch(ipCamera, personId, fecha);
 		searchPattern(match.getPerson());
 	}
 	
-	private Match saveMatch(String ipCameraName, long personId, Date date){
+	private Match saveMatch(IPCamera ipCameraModel, long personId, Date date){
 		
 	    String personName = "person"+ personId;
-	    System.out.println("PERSON NAME -> "+personName);
+	    System.out.println("PERSON NAME -> "+personName+", CAMERA NAME: ->"+ipCameraModel.getName());
 		Person person = personRepository.findByName(personName);
 		
-		IPCamera ipCamera = ipCameraRepository.findByName(ipCameraName);
+		IPCamera ipCamera = ipCameraRepository.findByName(ipCameraModel.getName());
 		Match match = new Match(ipCamera, person, date);
 		
 		Match macthFind = matchRepository.findByCameraPerson(ipCamera.getId(), person.getId());

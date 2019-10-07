@@ -26,6 +26,8 @@ public class IPCamerasRecord implements Runnable{
 	
 	private Map<String, String> deviceIdVideoURL;
 	
+	private int cont = 0;
+	
 	public void setConf(IPCamerasManager ipCamerasManager, Entrenar entrenamiento){
 		this.reconocimientoFacial.setConf(entrenamiento);
 		
@@ -37,17 +39,41 @@ public class IPCamerasRecord implements Runnable{
 	@Override
 	public void run() {
 	    try {
+	    	
 	    	List<IPCamera> devices = ipCamerasManager.findDevices();
 	    	for (IPCamera device : devices) {
 				
 				List<BufferedImage> images = new ArrayList<BufferedImage>();
 				
 				String videoURL = ipCamerasManager.getVideoURL(device.getDeviceId());
+				/*//PRUEBAS
+				if(device.getName().equals("F-CAM-VF-1") && cont==1){
+					cont++;
+					
+					videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=2OXDxhX3--88LetXD6HBJ";
+					String videoFile = "img/videoFrames/"+device.getName()+".mp4";
+					ipCamerasManager.saveFile(videoURL, videoFile);
+					
+					DecodeAndCaptureFrames decodeAndCaptureFramesnew = new DecodeAndCaptureFrames(videoFile);
+					images = decodeAndCaptureFramesnew.getImages();
+					
+					for (BufferedImage image : images) {
+						Mat frame = bufferedImageToMat(image);
+						Mat frame_gray = new Mat();
+						this.reconocimientoFacial.reconocer(device, frame, frame_gray);
+						boolean encontrado = this.reconocimientoFacial.reconocer(device, frame, frame_gray);
+						if(encontrado){
+							break;
+						}
+					}
+					
+				}
+				*/
 				if(videoURL!=null){
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
 					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){
-						
+						cont++;
 						String videoFile = "img/videoFrames/"+device.getName()+".mp4";
 						ipCamerasManager.saveFile(videoURL, videoFile);
 						
@@ -57,14 +83,17 @@ public class IPCamerasRecord implements Runnable{
 						for (BufferedImage image : images) {
 							Mat frame = bufferedImageToMat(image);
 							Mat frame_gray = new Mat();
-							this.reconocimientoFacial.reconocer(device, frame, frame_gray);
+							boolean encontrado = this.reconocimientoFacial.reconocer(device, frame, frame_gray);
+							if(encontrado){
+								break;
+							}
 						}
 						
 						this.deviceIdVideoURL.put(device.getDeviceId(), videoURL);
 					}
 					else{
 						System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no se ha procesado por no detectar cambios");
-					}	
+					}		
 				}
 				else{
 					System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no tiene videos disponibles");

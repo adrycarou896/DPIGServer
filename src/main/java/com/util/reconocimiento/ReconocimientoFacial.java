@@ -54,7 +54,7 @@ public class ReconocimientoFacial {
     	//this.server = new Server();
     }
     
-    public void reconocer(IPCamera device, Mat frame, Mat frame_gray) throws Exception{
+    public boolean reconocer(IPCamera device, Mat frame, Mat frame_gray) throws Exception{
 		
 		Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
         Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
@@ -93,6 +93,7 @@ public class ReconocimientoFacial {
     			if(!this.personsTimes.containsKey(personId)) {
     				this.personsTimes.put(personId, momentoActual);
     				this.patternsManager.find(device, personId, new Date());
+    				return true;
     				//this.server.sendMatch(this.cameraId, personId, new Date());
     			}
     			else {
@@ -101,6 +102,7 @@ public class ReconocimientoFacial {
     				if(tiempoTranscurrido>=5000) {
     					this.personsTimes.replace(personId, momentoActual);
     					this.patternsManager.find(device, personId, new Date());
+    					return true;
     					//this.server.sendMatch(this.cameraId, personId, new Date());
     				}
     			}
@@ -108,6 +110,7 @@ public class ReconocimientoFacial {
     		}
     		
         } 
+        return false;
         
     }
     
