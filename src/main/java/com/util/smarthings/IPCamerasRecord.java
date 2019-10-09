@@ -28,18 +28,29 @@ public class IPCamerasRecord implements Runnable{
 	
 	private int cont = 0;
 	
+	private IPCamera deviceWithImages;
+	
+	private List<String> orderList;
+	
 	public void setConf(IPCamerasManager ipCamerasManager, Entrenar entrenamiento){
 		this.reconocimientoFacial.setConf(entrenamiento);
 		
 		this.ipCamerasManager = ipCamerasManager;
 		
 		this.deviceIdVideoURL = new HashMap<String, String>();
+		
+		
+		this.orderList = new ArrayList<String>();
+		this.orderList.add("Camera");
+		this.orderList.add("F-CAM-VF-1");
+		this.orderList.add("Camera");
+		//this.orderList.add("Camera4");
+		
 	}
 	
 	@Override
 	public void run() {
 	    try {
-	    	
 	    	List<IPCamera> devices = ipCamerasManager.findDevices();
 	    	for (IPCamera device : devices) {
 				
@@ -69,7 +80,23 @@ public class IPCamerasRecord implements Runnable{
 					
 				}
 				*/
-				if(videoURL!=null){
+				
+				//PRARA PRUEBA - Cada cámara analizada tendrá el ultimo video de Camera 
+				/*if(videoURL!=null){
+					if(deviceWithImages!=null){
+						videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
+					}
+				}
+				else{
+					deviceWithImages = device;
+					videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
+				}*/
+				//
+				
+				videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
+				
+				if(videoURL!=null && this.orderList.get(0).equals(device.getName())){
+					this.orderList.remove(0);
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
 					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){
@@ -89,12 +116,18 @@ public class IPCamerasRecord implements Runnable{
 							}
 						}
 						
-						this.deviceIdVideoURL.put(device.getDeviceId(), videoURL);
+						if(!this.deviceIdVideoURL.containsKey(device.getDeviceId())){
+							this.deviceIdVideoURL.put(device.getDeviceId(), videoURL);
+						}
+						else{
+							this.deviceIdVideoURL.replace(device.getDeviceId(), videoURL);
+						}
+						
 					}
 					else{
 						System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no se ha procesado por no detectar cambios");
 					}		
-				}
+	    		}
 				else{
 					System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no tiene videos disponibles");
 				}

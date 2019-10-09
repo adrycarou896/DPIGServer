@@ -48,6 +48,7 @@ public class EventsServerConfiguration {
 						
 						IPCamerasManager ipCamerasManager = new IPCamerasManager();
 						ipCamerasRecord.setConf(ipCamerasManager, train);
+						
 						while (true) {
 							//Hacerlo todo en servidor
 							//hacer pruebas de usuario através de peticiones web a este servidor

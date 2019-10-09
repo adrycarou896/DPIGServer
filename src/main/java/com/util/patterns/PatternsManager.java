@@ -41,7 +41,9 @@ public class PatternsManager {
 	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
 	
 	public void find(IPCamera ipCamera, long personId, Date fecha){
-		
+		if(ipCamera.getName().equals("F-CAM-VF-1")){
+			System.out.println("SUU");
+		}
 		Match match = saveMatch(ipCamera, personId, fecha);
 		searchPattern(match.getPerson());
 	}
@@ -104,6 +106,7 @@ public class PatternsManager {
 				personEventsSaved.add(event);
 				
 				this.lastEventPersons.put(person.getName(), personEventsSaved);
+				
 				eventServer.saveData(person,event);	
 			}
 			
