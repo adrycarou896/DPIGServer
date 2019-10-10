@@ -54,6 +54,14 @@ public class ReconocimientoFacial {
     	//this.server = new Server();
     }
     
+    public void setConf(){
+    	this.Cascade = new CascadeClassifier(RutaDelCascade);
+    	this.rostros = new MatOfRect();
+
+    	this.personsTimes = new HashMap<Long, Long>();
+    	//this.server = new Server();
+    }
+    
     public boolean reconocer(IPCamera device, Mat frame, Mat frame_gray) throws Exception{
 		
 		Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro

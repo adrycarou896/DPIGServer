@@ -16,17 +16,18 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
-import com.util.reconocimiento.ReconocimientoFacial;
+import com.util.reconocimiento.ReconocimientoFacialPrueba;
 
 public class IPCameraRecordPrueba implements Runnable{
 	
 	private IPCamerasManager ipCamerasManager;
 	
-	private ReconocimientoFacial reconocimientoFacial;
-	 
-	public IPCameraRecordPrueba(IPCamerasManager ipCamerasManager){
+	private ReconocimientoFacialPrueba reconocimientoFacialPrueba;
+	
+	public void setConf(IPCamerasManager ipCamerasManager){
 		this.ipCamerasManager = ipCamerasManager;
-		this.reconocimientoFacial = new ReconocimientoFacial();
+		this.reconocimientoFacialPrueba = new ReconocimientoFacialPrueba();
+		this.reconocimientoFacialPrueba.setConf();
 	}
 	
 	@Override
@@ -34,15 +35,15 @@ public class IPCameraRecordPrueba implements Runnable{
 	    try {
 	    	List<BufferedImage> images = new ArrayList<BufferedImage>();
 			
-			String videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
+			//String videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
 				
-			String videoFile = "img/videoFrames/"+"Camera"+".mp4";
-			ipCamerasManager.saveFile(videoURL, videoFile);
+			String videoFile = "img/videoFrames/"+"F-CAM-VF-1"+".mp4";
+			//ipCamerasManager.saveFile(videoURL, videoFile);
 			
 			DecodeAndCaptureFramesPrueba decodeAndCaptureFramesnewPrueba = new DecodeAndCaptureFramesPrueba(videoFile);
 			images = decodeAndCaptureFramesnewPrueba.getImages();
 			
-			int cont = 1;
+			int cont = 300;
 			for (BufferedImage image : images) {
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
 				ImageIO.write(image, "jpg", os);
@@ -54,7 +55,7 @@ public class IPCameraRecordPrueba implements Runnable{
 				
 				Mat frame_gray = new Mat();
 				
-				this.reconocimientoFacial.reconocerRostroYGuardar(cont, frame, frame_gray);
+				this.reconocimientoFacialPrueba.reconocerRostroYGuardar(cont, frame, frame_gray);
 				
 				cont++;
 			}

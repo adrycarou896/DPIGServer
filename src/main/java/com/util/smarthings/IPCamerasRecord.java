@@ -93,7 +93,8 @@ public class IPCamerasRecord implements Runnable{
 				}*/
 				//
 				
-				videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
+				videoURL = ipCamerasManager.getVideoURL("2abf098f-694c-4be2-87f1-249ac5050712");
+				//videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
 				
 				if(videoURL!=null && this.orderList.size()>0 && this.orderList.get(0).equals(device.getName())){
 					this.orderList.remove(0);
