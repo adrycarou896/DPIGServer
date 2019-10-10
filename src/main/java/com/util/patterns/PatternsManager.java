@@ -98,7 +98,7 @@ public class PatternsManager {
 						personEventsSaved.clear();
 					}
 					personEventsSaved.add(event);
-					eventServer.saveData(person,event);	
+					eventServer.sendData(person,event);	
 				}
 			}
 			else{
@@ -107,7 +107,7 @@ public class PatternsManager {
 				
 				this.lastEventPersons.put(person.getName(), personEventsSaved);
 				
-				eventServer.saveData(person,event);	
+				eventServer.sendData(person,event);	
 			}
 			
 			List<Alert> eventAlerts = insertDataService.getAlertByEvent(event);

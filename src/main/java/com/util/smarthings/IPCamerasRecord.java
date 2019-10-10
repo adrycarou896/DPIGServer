@@ -81,7 +81,7 @@ public class IPCamerasRecord implements Runnable{
 				}
 				*/
 				
-				//PRARA PRUEBA - Cada cámara analizada tendrá el ultimo video de Camera 
+				//PRARA PRUEBA - Cada cámara analizada tendrá el ultimo video de Camera CORRECTO
 				/*if(videoURL!=null){
 					if(deviceWithImages!=null){
 						videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
@@ -95,11 +95,11 @@ public class IPCamerasRecord implements Runnable{
 				
 				videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
 				
-				if(videoURL!=null && this.orderList.get(0).equals(device.getName())){
+				if(videoURL!=null && this.orderList.size()>0 && this.orderList.get(0).equals(device.getName())){
 					this.orderList.remove(0);
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
-					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){
+//					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ CORRECTO
 						cont++;
 						String videoFile = "img/videoFrames/"+device.getName()+".mp4";
 						ipCamerasManager.saveFile(videoURL, videoFile);
@@ -123,10 +123,10 @@ public class IPCamerasRecord implements Runnable{
 							this.deviceIdVideoURL.replace(device.getDeviceId(), videoURL);
 						}
 						
-					}
+/*					}
 					else{
 						System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no se ha procesado por no detectar cambios");
-					}		
+					} CORRECTO	*/	
 	    		}
 				else{
 					System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no tiene videos disponibles");

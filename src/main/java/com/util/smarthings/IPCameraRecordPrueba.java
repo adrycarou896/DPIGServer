@@ -69,7 +69,8 @@ public class IPCameraRecordPrueba implements Runnable{
 	    byte[] temporaryImageInMemory = readStream(inputStream);
 
 	    // Decode into mat. Use any IMREAD_ option that describes your image appropriately
-	    Mat outputImage = Imgcodecs.imdecode(new MatOfByte(temporaryImageInMemory), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+	    //Mat outputImage = Imgcodecs.imdecode(new MatOfByte(temporaryImageInMemory), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+	    Mat outputImage = Imgcodecs.imdecode(new MatOfByte(temporaryImageInMemory), -1);
 	    return outputImage;
 	}
 	
