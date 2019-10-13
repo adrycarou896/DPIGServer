@@ -1,0 +1,5 @@
+Cuando está leyendo:
+clip": {
+                    "value": {
+                        "correlationId": "e23f51e1-edb3-11e9-99bf-99a2ff22d589",
+                        "status": "INITIATED"

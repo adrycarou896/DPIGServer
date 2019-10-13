@@ -1,5 +1,8 @@
 package com.util.smarthings;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.IMREAD_GRAYSCALE;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.Map;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +34,9 @@ public class IPCamerasRecord implements Runnable{
 	
 	private IPCamera deviceWithImages;
 	
-	private List<String> orderList;
+	//private Map<Long, List<String>> personsEncontradas;
+	
+	//private List<String> orderList;
 	
 	public void setConf(IPCamerasManager ipCamerasManager, Entrenar entrenamiento){
 		this.reconocimientoFacial.setConf(entrenamiento);
@@ -40,11 +46,14 @@ public class IPCamerasRecord implements Runnable{
 		this.deviceIdVideoURL = new HashMap<String, String>();
 		
 		
-		this.orderList = new ArrayList<String>();
-		this.orderList.add("Camera");
-		this.orderList.add("F-CAM-VF-1");
-		this.orderList.add("Camera");
+		/*
+		orderList = new ArrayList<String>();
+		orderList.add("Camera");
+		orderList.add("F-CAM-VF-1");
+		orderList.add("Camera");
 		//this.orderList.add("Camera4");
+		*/
+		
 		
 	}
 	
@@ -96,8 +105,9 @@ public class IPCamerasRecord implements Runnable{
 				videoURL = ipCamerasManager.getVideoURL("2abf098f-694c-4be2-87f1-249ac5050712");
 				//videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
 				
-				if(videoURL!=null && this.orderList.size()>0 && this.orderList.get(0).equals(device.getName())){
-					this.orderList.remove(0);
+				//if(videoURL!=null && this.orderList.size()>0 && this.orderList.get(0).equals(device.getName())){
+				//	this.orderList.remove(0);
+				if(videoURL!=null){
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
 //					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ CORRECTO
@@ -111,8 +121,9 @@ public class IPCamerasRecord implements Runnable{
 						for (BufferedImage image : images) {
 							Mat frame = bufferedImageToMat(image);
 							Mat frame_gray = new Mat();
-							boolean encontrado = this.reconocimientoFacial.reconocer(device, frame, frame_gray);
-							if(encontrado){
+							long personIdEncontrada = this.reconocimientoFacial.reconocer(device, frame, frame_gray);
+							if(personIdEncontrada!=-1){
+								//Imgcodecs.imwrite("img/imagenOriginal.jpg", frame);
 								break;
 							}
 						}

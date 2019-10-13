@@ -35,10 +35,10 @@ public class IPCameraRecordPrueba implements Runnable{
 	    try {
 	    	List<BufferedImage> images = new ArrayList<BufferedImage>();
 			
-			//String videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
+			String videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=uuYSRuIQes11cDLuctcyJ";
 				
-			String videoFile = "img/videoFrames/"+"F-CAM-VF-1"+".mp4";
-			//ipCamerasManager.saveFile(videoURL, videoFile);
+			String videoFile = "img/videoFrames/"+"Camera"+".mp4";
+			ipCamerasManager.saveFile(videoURL, videoFile);
 			
 			DecodeAndCaptureFramesPrueba decodeAndCaptureFramesnewPrueba = new DecodeAndCaptureFramesPrueba(videoFile);
 			images = decodeAndCaptureFramesnewPrueba.getImages();

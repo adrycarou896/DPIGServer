@@ -30,7 +30,7 @@ import com.util.smarthings.IPCamerasManager;
 @Scope("singleton")
 public class InsertDataService {
 	
-	private static final int NUM_PERSONS = 3;
+	private static final int NUM_PERSONS = 2;
 	
 	@Autowired
 	private IPCameraRepository ipCameraRepository;

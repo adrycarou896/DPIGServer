@@ -112,7 +112,10 @@ public class IPCamerasManager {
 		String value = clipJSON.get("value").toString(); 
 		if(!value.equals("null")){
 			JSONObject valueJSON = new JSONObject(value);
-			return valueJSON.get("clipPath").toString();
+			String status = valueJSON.get("status").toString();
+			if(status.equals("COMPLETE")){
+				return valueJSON.get("clipPath").toString();
+			}
 		}
 		return null;
 		

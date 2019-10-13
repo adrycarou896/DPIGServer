@@ -20,7 +20,7 @@ public class Entrenar implements Runnable{
 	
 	private FaceRecognizer faceRecognizer;
 	
-	public static final int NUMERO_DE_USUARIOS = 3;
+	public static final int NUMERO_DE_USUARIOS = 2;
 	
 	public Entrenar() {
 		this.faceRecognizer = FisherFaceRecognizer.create();
@@ -66,18 +66,20 @@ public class Entrenar implements Runnable{
 		IntBuffer labelsBuf = labels.createBuffer();
 		
         int counter = 0; 
+        
 		for (ImageSample imageSample: imageSamples) {
 			
 			Mat img = imread(imageSample.getImageFile().getAbsolutePath(), IMREAD_GRAYSCALE); 
 	        
             images.put(counter, img); 
  
-            labelsBuf.put(counter, imageSample.getLabel()); 
+            labelsBuf.put(counter, imageSample.getLabel()); //Aquí se define a la imagen el id del usuario al que pertenece
             
             counter++; 
         } 
         
         faceRecognizer.train(images, labels);
+      
         
     } 
 	

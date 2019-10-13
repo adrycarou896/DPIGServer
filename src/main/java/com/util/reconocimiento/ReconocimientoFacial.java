@@ -10,8 +10,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -45,6 +47,10 @@ public class ReconocimientoFacial {
     @Autowired
     private PatternsManager patternsManager;
     
+    private Map<Long, List<String>> personsEncontradas;
+    
+    private List<String> orderList;
+    
     public void setConf(Entrenar entrenamiento){
     	this.Cascade = new CascadeClassifier(RutaDelCascade);
     	this.rostros = new MatOfRect();
@@ -52,6 +58,15 @@ public class ReconocimientoFacial {
     	this.entrenamiento = entrenamiento;
     	this.personsTimes = new HashMap<Long, Long>();
     	//this.server = new Server();
+    	
+    	orderList = new ArrayList<String>();
+    	orderList.add("Camera");
+		orderList.add("F-CAM-VF-1");
+		orderList.add("Camera");
+		
+		this.personsEncontradas = new HashMap<Long, List<String>>();
+		
+		
     }
     
     public void setConf(){
@@ -62,7 +77,7 @@ public class ReconocimientoFacial {
     	//this.server = new Server();
     }
     
-    public boolean reconocer(IPCamera device, Mat frame, Mat frame_gray) throws Exception{
+    public long reconocer(IPCamera device, Mat frame, Mat frame_gray) throws Exception{
 		
 		Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
         Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
@@ -87,7 +102,8 @@ public class ReconocimientoFacial {
     		InputStream input = new FileInputStream(rutaImagen);
     		String srcSalida="img/test.jpg";
 			OutputStream output = new FileOutputStream(srcSalida);
-			resize(input, output, 607, 607);
+			//resize(input, output, 607, 607);
+			resize(input, output, 52, 52);
 			
 			/*input = new FileInputStream(srcSalida);
 			output = new FileOutputStream("img/usuario0/img"+cont+".jpg");
@@ -100,8 +116,19 @@ public class ReconocimientoFacial {
     			long momentoActual = System.currentTimeMillis();
     			if(!this.personsTimes.containsKey(personId)) {
     				this.personsTimes.put(personId, momentoActual);
-    				this.patternsManager.find(device, personId, new Date());
-    				return true;
+    				
+    				//NUEVO-PRUEBA
+    				if(!personsEncontradas.containsKey(personId)){
+						personsEncontradas.put(personId, orderList);
+					}
+					
+					if(personsEncontradas.get(personId).size()>0 && personsEncontradas.get(personId).get(0).equals(device.getName())){
+						personsEncontradas.get(personId).remove(0);
+						this.patternsManager.find(device, personId, new Date());
+					}
+					//
+    				
+    				return personId;
     				//this.server.sendMatch(this.cameraId, personId, new Date());
     			}
     			else {
@@ -109,8 +136,19 @@ public class ReconocimientoFacial {
     				long tiempoTranscurrido = momentoActual - momentoUltimoMatch;
     				if(tiempoTranscurrido>=5000) {
     					this.personsTimes.replace(personId, momentoActual);
-    					this.patternsManager.find(device, personId, new Date());
-    					return true;
+    					
+    					//NUEVO-PRUEBA
+    					if(!personsEncontradas.containsKey(personId)){
+    						personsEncontradas.put(personId, orderList);
+    					}
+    				
+    					if(personsEncontradas.get(personId).size()>0 && personsEncontradas.get(personId).get(0).equals(device.getName())){
+    						personsEncontradas.get(personId).remove(0);
+    						this.patternsManager.find(device, personId, new Date());
+    					}
+    					//NUEVO-PRUEBA
+    					
+    					return personId;
     					//this.server.sendMatch(this.cameraId, personId, new Date());
     				}
     			}
@@ -118,7 +156,7 @@ public class ReconocimientoFacial {
     		}
     		
         } 
-        return false;
+        return -1;
         
     }
     

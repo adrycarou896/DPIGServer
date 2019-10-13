@@ -57,9 +57,10 @@ public class ReconocimientoFacialPrueba {
     		
     		//InputStream input = new FileInputStream(rutaImagen);
     		//System.out.println("INPUT: "+input);
+    		
     		BufferedImage input=ImageIO.read(new File(srcSalida));
 			OutputStream output = new FileOutputStream(srcSalida);
-			resizePrueba(input, output, 607, 607);
+			resizePrueba(input, output, 52, 52);
 			
 			/*input = new FileInputStream(srcSalida);
 			output = new FileOutputStream("img/usuario0/img"+cont+".jpg");
