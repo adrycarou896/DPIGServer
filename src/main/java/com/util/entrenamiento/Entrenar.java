@@ -15,12 +15,15 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
 import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
+import org.opencv.imgcodecs.Imgcodecs;
 
 public class Entrenar implements Runnable{
 	
 	private FaceRecognizer faceRecognizer;
 	
 	public static final int NUMERO_DE_USUARIOS = 2;
+	
+	private double mayor = 0.0;
 	
 	public Entrenar() {
 		this.faceRecognizer = FisherFaceRecognizer.create();
@@ -83,15 +86,22 @@ public class Entrenar implements Runnable{
         
     } 
 	
-	public Pair<Integer, Double> test(String testImage){
+	public Pair<Integer, Double> test(String testImage, org.opencv.core.Mat frame){
 		
 		 Mat testImageMat = imread(testImage, IMREAD_GRAYSCALE); 
 		
 		 int[] enteros = new int[1];
          double[] confidences = new double[1];
 		 faceRecognizer.predict(testImageMat, enteros, confidences);
-		
-	     if(confidences[0]<425){
+		 if(confidences[0]>mayor){
+			 mayor=confidences[0];
+			 System.out.println("MAYOR: " + mayor); 
+		 }
+		 
+	     if(confidences[0]>16){
+	    	 Imgcodecs.imwrite("img/paso.jpg", frame);
+	    	 System.out.println("ENTROOOOOOOO");
+	    	 //System.out.println("Confidences--------------------->: "+confidences[0]);
 	    	 //System.out.println("El usuario que aparece en la imagen "+testImage+" es el usuario "+nombreUsuario);
 	  	     //System.out.println("        *Confidencia: "+confidences[0]);
 	  	     return new Pair<Integer,Double>(enteros[0], confidences[0]);

@@ -51,6 +51,8 @@ public class ReconocimientoFacial {
     
     private List<String> orderList;
     
+    private Map<String, List<Long>> devicePersons;
+    
     public void setConf(Entrenar entrenamiento){
     	this.Cascade = new CascadeClassifier(RutaDelCascade);
     	this.rostros = new MatOfRect();
@@ -66,6 +68,7 @@ public class ReconocimientoFacial {
 		
 		this.personsEncontradas = new HashMap<Long, List<String>>();
 		
+		this.devicePersons = new HashMap<>();
 		
     }
     
@@ -110,10 +113,19 @@ public class ReconocimientoFacial {
 			resize(input, output, 607, 607);
 			cont++;*/
 			
-    		Pair<Integer, Double> personPair = this.entrenamiento.test(srcSalida);
+    		Pair<Integer, Double> personPair = this.entrenamiento.test(srcSalida,frameRecortado);
     		if(personPair!=null){
     			long personId = (long) personPair.getFirst();//La id es la label
-    			long momentoActual = System.currentTimeMillis();
+    			boolean realizarElFind = addPersonToDeviceList(device.getName(), personId);
+    			
+    			//Cuando cambie de device se ejecuta el find
+    			if(realizarElFind){
+    				this.patternsManager.find(device, personId, new Date());
+    			}
+    			
+    			
+    			/*long momentoActual = System.currentTimeMillis();
+    			
     			if(!this.personsTimes.containsKey(personId)) {
     				this.personsTimes.put(personId, momentoActual);
     				
@@ -134,7 +146,7 @@ public class ReconocimientoFacial {
     			else {
     				long momentoUltimoMatch = this.personsTimes.get(personId);
     				long tiempoTranscurrido = momentoActual - momentoUltimoMatch;
-    				if(tiempoTranscurrido>=5000) {
+    				//if(tiempoTranscurrido>=5000) {
     					this.personsTimes.replace(personId, momentoActual);
     					
     					//NUEVO-PRUEBA
@@ -151,13 +163,48 @@ public class ReconocimientoFacial {
     					return personId;
     					//this.server.sendMatch(this.cameraId, personId, new Date());
     				}
-    			}
+    			}*/
     			
     		}
     		
         } 
         return -1;
         
+    }
+    
+    private boolean addPersonToDeviceList(String device, Long person)
+    {
+    	boolean sigueEnElMismoDevice = cleanPersonOfDevicesList(device, person);
+    	if(!sigueEnElMismoDevice){
+    		if(!devicePersons.containsKey(device)){
+        		List<Long> persons = new ArrayList<>();
+    			persons.add(person);
+    			devicePersons.put(device, persons);
+        	}
+        	else{
+        		List<Long> persons = devicePersons.get(device);
+        		persons.add(person);
+        	}
+    		return true;
+    	}
+    	return false;
+    	
+    }
+    
+    private boolean cleanPersonOfDevicesList(String device, Long person){
+    	for (Map.Entry<String, List<Long>> entry : devicePersons.entrySet()) {
+    		String keyDevice = entry.getKey();
+    		List<Long> personsList = entry.getValue();
+    		if(personsList.contains(person)){
+    			if(!keyDevice.equals(device)){
+    				personsList.remove(person);
+    			}
+    			else{
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
     }
     
     public void reconocerRostroYGuardar(int numImagen, Mat frame, Mat frame_gray) throws Exception{
