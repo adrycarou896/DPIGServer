@@ -21,10 +21,10 @@ import com.model.alert.Alert;
 import com.model.event.Event;
 import com.model.event.EventComplex;
 import com.model.event.EventSimple;
+import com.reader.ReadProperties;
 import com.repository.IPCameraRepository;
 import com.repository.PersonRepository;
-import com.util.ReadProperties;
-import com.util.smarthings.IPCamerasManager;
+import com.smarthings.IPCamerasManager;
 
 @Service
 @Scope("singleton")
