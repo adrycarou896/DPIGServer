@@ -87,9 +87,9 @@ public class ReconocimientoFacial {
 			Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
 			
 			//Se guarda la imagen
-    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
+    		//Imgcodecs.imwrite(rutaImagen, frameAdecuado);
 
-    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
+    		Pair<Integer, Double> personPair = this.entrenamiento.test(frameAdecuado);
     		if(personPair!=null){
     			long personId = (long) personPair.getFirst();//La id es la label
 

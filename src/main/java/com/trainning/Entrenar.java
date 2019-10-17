@@ -16,6 +16,8 @@ import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_face.EigenFaceRecognizer;
 import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
 import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import com.model.trainning.ImageSample;
 
@@ -29,9 +31,14 @@ public class Entrenar implements Runnable{
 	
 	private double menor = Double.POSITIVE_INFINITY;
 	
+	private OpenCVFrameConverter.ToOrgOpenCvCoreMat conversorMatOpenCVCore;
+	private OpenCVFrameConverter.ToMat conversorMat;
+	
 	public Entrenar() {
 		this.faceRecognizer = EigenFaceRecognizer.create();
 		//this.faceRecognizer = FisherFaceRecognizer.create(NUMERO_DE_USUARIOS, DBL_MAX);
+		this.conversorMatOpenCVCore = new OpenCVFrameConverter.ToOrgOpenCvCoreMat();
+		this.conversorMat = new OpenCVFrameConverter.ToMat();
 	}
 	
 	@Override
@@ -91,9 +98,11 @@ public class Entrenar implements Runnable{
         
     } 
 	
-	public Pair<Integer, Double> test(String testImage){
+	public Pair<Integer, Double> test(org.opencv.core.Mat image){
 		
-		 Mat testImageMat = imread(testImage, IMREAD_GRAYSCALE); 
+		 //Mat testImageMat = imread(testImage, IMREAD_GRAYSCALE); 
+		 Frame frame = conversorMatOpenCVCore.convert(image);
+		 Mat testImageMat = conversorMat.convert(frame);
 		
 		 int[] enteros = new int[1];
          double[] confidences = new double[1];
