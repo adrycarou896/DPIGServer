@@ -49,6 +49,8 @@ public class EventsServerConfiguration {
 						IPCamerasManager ipCamerasManager = new IPCamerasManager();
 						ipCamerasRecord.setConf(ipCamerasManager, train);
 						int numIter=0;
+						long start = System.currentTimeMillis();
+						ipCamerasRecord.setStart(start);
 						while (true) {
 							//Hacerlo todo en servidor
 							//hacer pruebas de usuario através de peticiones web a este servidor
@@ -56,7 +58,6 @@ public class EventsServerConfiguration {
 							numIter++;
 							ipCamerasRecord.setNumIter(numIter);
 							ipCamerasRecord.run();
-							
 							
 							try {
 								Thread.sleep(1000);

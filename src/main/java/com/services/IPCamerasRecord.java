@@ -37,6 +37,8 @@ public class IPCamerasRecord implements Runnable{
 	
 	private int numIter = 0;
 	
+	private long start;
+	
 	//private Map<Long, List<String>> personsEncontradas;
 	
 	//private List<String> orderList;
@@ -60,8 +62,16 @@ public class IPCamerasRecord implements Runnable{
 		
 	}
 	
+	public Map<String, List<Long>> getDevicePersons(){
+		return this.reconocimientoFacial.getDevicePersons();
+	}
+	
 	public void setNumIter(int numIter){
 		this.numIter=numIter;
+	}
+	
+	public void setStart(long start){
+		this.start = start;
 	}
 	
 	@Override
@@ -132,6 +142,9 @@ public class IPCamerasRecord implements Runnable{
 							long personIdEncontrada = this.reconocimientoFacial.reconocer(device, frame, frame_gray, numIter);
 							if(personIdEncontrada!=-1){
 								//Imgcodecs.imwrite("img/imagenOriginal.jpg", frame);
+								long end = System.currentTimeMillis();
+								System.out.println("TIME: " + (end-start));
+								start = System.currentTimeMillis();
 								break;
 							}
 						}

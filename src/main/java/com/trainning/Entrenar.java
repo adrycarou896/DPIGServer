@@ -16,6 +16,7 @@ import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_face.EigenFaceRecognizer;
 import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
 import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
+import org.bytedeco.javacpp.opencv_face.LBPHFaceRecognizer;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
@@ -23,7 +24,7 @@ import com.model.trainning.ImageSample;
 
 public class Entrenar implements Runnable{
 	
-	private EigenFaceRecognizer faceRecognizer;
+	private LBPHFaceRecognizer lBPHFaceRecognizer;
 	
 	public static final int NUMERO_DE_USUARIOS = 2;
 	
@@ -35,7 +36,8 @@ public class Entrenar implements Runnable{
 	private OpenCVFrameConverter.ToMat conversorMat;
 	
 	public Entrenar() {
-		this.faceRecognizer = EigenFaceRecognizer.create();
+		//this.faceRecognizer = EigenFaceRecognizer.create();
+		this.lBPHFaceRecognizer = LBPHFaceRecognizer.create();
 		//this.faceRecognizer = FisherFaceRecognizer.create(NUMERO_DE_USUARIOS, DBL_MAX);
 		this.conversorMatOpenCVCore = new OpenCVFrameConverter.ToOrgOpenCvCoreMat();
 		this.conversorMat = new OpenCVFrameConverter.ToMat();
@@ -93,20 +95,20 @@ public class Entrenar implements Runnable{
             counter++; 
         } 
         
-        faceRecognizer.train(images, labels);
+		lBPHFaceRecognizer.train(images, labels);
       
         
     } 
 	
-	public Pair<Integer, Double> test(org.opencv.core.Mat image){
+	public Pair<Integer, Double> test(String testImage){
 		
-		 //Mat testImageMat = imread(testImage, IMREAD_GRAYSCALE); 
-		 Frame frame = conversorMatOpenCVCore.convert(image);
-		 Mat testImageMat = conversorMat.convert(frame);
+		 Mat testImageMat = imread(testImage, IMREAD_GRAYSCALE); 
+		 //Frame frame = conversorMatOpenCVCore.convert(image);
+		 //Mat testImageMat = conversorMat.convert(frame);
 		
 		 int[] enteros = new int[1];
          double[] confidences = new double[1];
-		 faceRecognizer.predict(testImageMat, enteros, confidences);
+         lBPHFaceRecognizer.predict(testImageMat, enteros, confidences);
 		 
 		 /*if(confidences[0]>mayor){
 			 mayor=confidences[0];

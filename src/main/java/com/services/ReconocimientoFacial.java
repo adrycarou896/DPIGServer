@@ -87,9 +87,10 @@ public class ReconocimientoFacial {
 			Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
 			
 			//Se guarda la imagen
-    		//Imgcodecs.imwrite(rutaImagen, frameAdecuado);
-
-    		Pair<Integer, Double> personPair = this.entrenamiento.test(frameAdecuado);
+    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
+			
+    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
+    		
     		if(personPair!=null){
     			long personId = (long) personPair.getFirst();//La id es la label
 
@@ -99,6 +100,7 @@ public class ReconocimientoFacial {
 				}
 				
 				if(personsEncontradas.get(personId).size()>0 && personsEncontradas.get(personId).get(0).equals(device.getName())){
+					
 					personsEncontradas.get(personId).remove(0);
 					
 					boolean realizarElFind = addPersonToDeviceList(device.getName(), personId);
@@ -108,6 +110,8 @@ public class ReconocimientoFacial {
 	    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
 	    		    	 
 	    				this.patternsManager.find(device, personId, new Date());
+	    				
+	    				return personId;
 	    			}
 					
 				}
@@ -119,6 +123,14 @@ public class ReconocimientoFacial {
         
     }
     
+    /**
+     * 
+     * @param device
+     * @param person
+     * @return
+     * 
+     * Si ese dispositivo no tiene a esa persona ya guardada se le añade
+     */
     private boolean addPersonToDeviceList(String device, Long person)
     {
     	boolean sigueEnElMismoDevice = cleanPersonOfDevicesList(device, person);
@@ -138,6 +150,14 @@ public class ReconocimientoFacial {
     	
     }
     
+    /**
+     * 
+     * @param device
+     * @param person
+     * @return
+     * 
+     * Asegura que solo el último dispositivo que reconoció a una persona x tenga a esa persona x.
+     */
     private boolean cleanPersonOfDevicesList(String device, Long person){
     	for (Map.Entry<String, List<Long>> entry : devicePersons.entrySet()) {
     		String keyDevice = entry.getKey();
@@ -152,6 +172,10 @@ public class ReconocimientoFacial {
     		}
     	}
     	return false;
+    }
+    
+    public Map<String, List<Long>>getDevicePersons(){
+    	return this.devicePersons;
     }
 	 
 }
