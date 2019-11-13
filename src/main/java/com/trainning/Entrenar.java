@@ -14,17 +14,13 @@ import org.apache.commons.math3.util.Pair;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_face.EigenFaceRecognizer;
-import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
-import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
-import org.bytedeco.javacpp.opencv_face.LBPHFaceRecognizer;
-import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import com.model.trainning.ImageSample;
 
 public class Entrenar implements Runnable{
 	
-	private LBPHFaceRecognizer lBPHFaceRecognizer;
+	private EigenFaceRecognizer eigenFaceRecognizer;
 	
 	public static final int NUMERO_DE_USUARIOS = 2;
 	
@@ -37,7 +33,7 @@ public class Entrenar implements Runnable{
 	
 	public Entrenar() {
 		//this.faceRecognizer = EigenFaceRecognizer.create();
-		this.lBPHFaceRecognizer = LBPHFaceRecognizer.create();
+		this.eigenFaceRecognizer = EigenFaceRecognizer.create();
 		//this.faceRecognizer = FisherFaceRecognizer.create(NUMERO_DE_USUARIOS, DBL_MAX);
 		this.conversorMatOpenCVCore = new OpenCVFrameConverter.ToOrgOpenCvCoreMat();
 		this.conversorMat = new OpenCVFrameConverter.ToMat();
@@ -95,7 +91,7 @@ public class Entrenar implements Runnable{
             counter++; 
         } 
         
-		lBPHFaceRecognizer.train(images, labels);
+		eigenFaceRecognizer.train(images, labels);
       
         
     } 
@@ -108,7 +104,7 @@ public class Entrenar implements Runnable{
 		
 		 int[] enteros = new int[1];
          double[] confidences = new double[1];
-         lBPHFaceRecognizer.predict(testImageMat, enteros, confidences);
+         eigenFaceRecognizer.predict(testImageMat, enteros, confidences);
 		 
 		 /*if(confidences[0]>mayor){
 			 mayor=confidences[0];
@@ -117,9 +113,11 @@ public class Entrenar implements Runnable{
 		 if(confidences[0]<menor){
 			 menor = confidences[0];
 		 }
-		 
-	     //if(confidences[0]>25){
+		 //LBPH -> <100
+		 //Eigen -> <1000
+		 System.out.println("CONF: "+confidences[0]);
 		 if(confidences[0]<1000){
+			 System.out.println("RECONOCIDO: "+confidences[0] + " id: "+enteros[0]);
 			 //System.out.println("MENOR: " + menor); 
 	    	 //System.out.println("MAYOR: " + mayor); 
 	    	 //System.out.println("Confidences--------------------->: "+confidences[0]);

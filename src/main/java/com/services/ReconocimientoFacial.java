@@ -2,6 +2,7 @@ package com.services;
 
 import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
+import com.model.Match;
+import com.repository.ImageFalsePositiveRepository;
 import com.trainning.Entrenar;
 
 @Service
@@ -35,7 +38,10 @@ public class ReconocimientoFacial {
     @Autowired
     private PatternsManager patternsManager;
     
-    private Map<Long, List<String>> personsEncontradas;
+    @Autowired
+	private ImageFalsePositiveRepository imageFalsePositiveRepository;
+    
+    private Map<String, List<String>> personsEncontradas;
     
     private List<String> orderList;
     
@@ -52,7 +58,7 @@ public class ReconocimientoFacial {
 		orderList.add("F-CAM-VF-1");
 		orderList.add("Camera");
 		
-		this.personsEncontradas = new HashMap<Long, List<String>>();
+		this.personsEncontradas = new HashMap<String, List<String>>();
 		
 		this.devicePersons = new HashMap<>();
 		
@@ -63,64 +69,82 @@ public class ReconocimientoFacial {
     	this.rostros = new MatOfRect();
     }
     
-    public long reconocer(IPCamera device, Mat frame, Mat frame_gray, int numIter) throws Exception{
+    public long reconocer(IPCamera device, Mat frame, Mat frame_gray, int numIter, IPCamera ipCamera, Map<Long, Integer> imagenesIdentificadas) throws Exception{
+    	
+    	//NUEVO-PRUEBA
+		if(!personsEncontradas.containsKey(ipCamera.getDeviceId())){
+			personsEncontradas.put(ipCamera.getDeviceId(), orderList);
+		}
 		
-		Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
-        Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
-        double w = frame.width();
-        double h = frame.height();
-        
-        Cascade.detectMultiScale(frame_gray, rostros, 1.1, 2, 0|CASCADE_SCALE_IMAGE, new Size(30, 30), new Size(w, h));
-        Rect[] rostrosLista = rostros.toArray();
-        
-        Rect rectCrop = new Rect();
-
-        for (Rect rostro : rostrosLista) {
-    		String rutaImagen = "img/imagenAdecuada.jpg";
-    	    
-    		//Se recorta la imagen
-    		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
-    		Mat frameRecortado = new Mat(frame,rectCrop);
-    		
-    		//Se pone en un tamaño adecuado
-			Mat frameAdecuado = new Mat();
-			Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
+		if(personsEncontradas.get(ipCamera.getDeviceId()).size()>0 && personsEncontradas.get(ipCamera.getDeviceId()).get(0).equals(device.getName())){
 			
-			//Se guarda la imagen
-    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
-			
-    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
-    		
-    		if(personPair!=null){
-    			long personId = (long) personPair.getFirst();//La id es la label
-
-    			//NUEVO-PRUEBA
-				if(!personsEncontradas.containsKey(personId)){
-					personsEncontradas.put(personId, orderList);
-				}
+			Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
+	        Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
+	        double w = frame.width();
+	        double h = frame.height();
+	        
+	        Cascade.detectMultiScale(frame_gray, rostros, 1.1, 2, 0|CASCADE_SCALE_IMAGE, new Size(30, 30), new Size(w, h));
+	        Rect[] rostrosLista = rostros.toArray();
+	        
+	        Rect rectCrop = new Rect();
+	
+	        for (Rect rostro : rostrosLista) {
+	    		String rutaImagen = "img/imagenAdecuada.jpg";
+	    	    
+	    		//Se recorta la imagen
+	    		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
+	    		Mat frameRecortado = new Mat(frame,rectCrop);
+	    		
+	    		//Se pone en un tamaño adecuado
+				Mat frameAdecuado = new Mat();
+				Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
 				
-				if(personsEncontradas.get(personId).size()>0 && personsEncontradas.get(personId).get(0).equals(device.getName())){
+				//Se guarda la imagen
+	    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
+				
+	    		if(!patternsManager.isImageFalsePositive(ipCamera, new File(rutaImagen))){
+					//System.out.println("NO ES UN FALSO POSITIVO -> personId: "+ipCamera.getId());
 					
-					personsEncontradas.get(personId).remove(0);
-					
-					boolean realizarElFind = addPersonToDeviceList(device.getName(), personId);
-					//Cuando cambie de device se ejecuta el find
-	    			if(realizarElFind){
-	    				Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
-	    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
-	    		    	 
-	    				this.patternsManager.find(device, personId, new Date());
-	    				
-	    				return personId;
-	    			}
-					
+		    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
+		    		
+		    		if(personPair!=null){
+		    			long personId = (long) personPair.getFirst();//La id es la label
+		    			
+						boolean sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
+						//Cuando cambie de device se ejecuta el find
+		    			if(!sigueEnElMismoDevice){
+		    				//Imgcodecs.imwrite("img/frames/"+match.getIpCamera().getName()+".jpg", frameAdecuado);
+		    				//-->Probar si las imagenes que recoge son iguales que las recogidas en el entrenamiento.
+		    				
+	    					//Actualizar el contador de veces encontrado para cada persona
+							if(!imagenesIdentificadas.containsKey(personId)){
+								imagenesIdentificadas.put(personId, 1);
+							}
+							else{
+								imagenesIdentificadas.replace(personId, imagenesIdentificadas.get(personId)+1);
+							} 
+	    					if(imagenesIdentificadas.get(personId)==1){
+	    						imagenesIdentificadas.replace(personId, 0);
+	    						
+								personsEncontradas.get(ipCamera.getDeviceId()).remove(0);
+								
+								Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
+			    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
+			    		    	
+			    		    	this.patternsManager.find(device, personId, new Date());
+			    		    	
+			    		    	return personId;
+	    					}
+		    			}
+				    }
 				}
-    			
-    		}
-    		
-        } 
-        return -1;
-        
+	    		
+	    	}
+   		} 
+		else{
+			return -2;
+		}
+     return -1;
     }
     
     /**
@@ -129,9 +153,9 @@ public class ReconocimientoFacial {
      * @param person
      * @return
      * 
-     * Si ese dispositivo no tiene a esa persona ya guardada se le añade
+     * Asegura que la persona solo se enucentra en la lista de personas reconocidas por una cámara (la última que le vió)
      */
-    private boolean addPersonToDeviceList(String device, Long person)
+    private boolean sigueEnElMismoDevice(String device, Long person)
     {
     	boolean sigueEnElMismoDevice = cleanPersonOfDevicesList(device, person);
     	if(!sigueEnElMismoDevice){
@@ -144,9 +168,9 @@ public class ReconocimientoFacial {
         		List<Long> persons = devicePersons.get(device);
         		persons.add(person);
         	}
-    		return true;
+    		return false;
     	}
-    	return false;
+    	return true;
     	
     }
     

@@ -1,8 +1,5 @@
 package com.services;
 
-import static org.bytedeco.javacpp.opencv_imgcodecs.IMREAD_GRAYSCALE;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
@@ -12,12 +9,12 @@ import java.util.Map;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
 import com.reader.ReadVideoFrames;
+import com.repository.IPCameraRepository;
 import com.smarthings.IPCamerasManager;
 import com.trainning.Entrenar;
 
@@ -25,6 +22,9 @@ import com.trainning.Entrenar;
 public class IPCamerasRecord implements Runnable{
 	
 	private IPCamerasManager ipCamerasManager;
+	
+	@Autowired
+	private IPCameraRepository ipCameraRepository;
 	
 	@Autowired
 	private ReconocimientoFacial reconocimientoFacial;
@@ -77,7 +77,7 @@ public class IPCamerasRecord implements Runnable{
 	@Override
 	public void run() {
 	    try {
-	    	List<IPCamera> devices = ipCamerasManager.findDevices();
+	    	List<IPCamera> devices = (List<IPCamera>) ipCameraRepository.findAll();
 	    	for (IPCamera device : devices) {
 				
 				List<BufferedImage> images = new ArrayList<BufferedImage>();
@@ -120,7 +120,7 @@ public class IPCamerasRecord implements Runnable{
 				//
 				
 				//videoURL = ipCamerasManager.getVideoURL("2abf098f-694c-4be2-87f1-249ac5050712");
-				videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=s38-zU_pBVEb9RkeWlDXJ";
+				videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=Cv83kQX9DvI0Gaa509clJ";
 				//videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=8Dbi3xSLL83_U9EiJ302J";
 				
 				//if(videoURL!=null && this.orderList.size()>0 && this.orderList.get(0).equals(device.getName())){
@@ -136,10 +136,14 @@ public class IPCamerasRecord implements Runnable{
 						ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFile);
 						images = decodeAndCaptureFramesnew.getImages();
 						
+						Map<Long, Integer> imagenesIdentificadas = new HashMap<Long, Integer>();
 						for (BufferedImage image : images) {
 							Mat frame = bufferedImageToMat(image);
 							Mat frame_gray = new Mat();
-							long personIdEncontrada = this.reconocimientoFacial.reconocer(device, frame, frame_gray, numIter);
+							long personIdEncontrada = this.reconocimientoFacial.reconocer(device, frame, frame_gray, numIter, device, imagenesIdentificadas);
+							if(personIdEncontrada==-2){
+								break;
+							}
 							if(personIdEncontrada!=-1){
 								//Imgcodecs.imwrite("img/imagenOriginal.jpg", frame);
 								long end = System.currentTimeMillis();
@@ -148,7 +152,6 @@ public class IPCamerasRecord implements Runnable{
 								break;
 							}
 						}
-						
 						if(!this.deviceIdVideoURL.containsKey(device.getDeviceId())){
 							this.deviceIdVideoURL.put(device.getDeviceId(), videoURL);
 						}

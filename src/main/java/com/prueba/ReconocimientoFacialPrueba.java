@@ -5,8 +5,9 @@ import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
@@ -18,6 +19,9 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+
+import com.model.IPCamera;
+import com.model.ImageFalsePositive;
 
 public class ReconocimientoFacialPrueba {
 	 
@@ -50,13 +54,40 @@ public class ReconocimientoFacialPrueba {
     		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
     		Mat frameRecortado = new Mat(frame,rectCrop);
     		
-    		String srcSalida="img/usuarioAdrian/faces/img"+numImagen+"cara"+caras+".jpg";
+    		String srcSalida="img/test/img"+numImagen+"cara"+caras+".jpg";
     		
     		Mat frameFinal = new Mat();
     		Imgproc.resize(frameRecortado, frameFinal, new Size(52,52));
     		
     		//Se guarda la imagen
     		Imgcodecs.imwrite(srcSalida, frameFinal);
+    		
+    		//----
+    		
+    		/*
+    		File saveFile = new File(srcSalida);
+    		FilenameFilter imgFilter = new FilenameFilter() { 
+    			public boolean accept(File dir, String name) { 
+                    name = name.toLowerCase(); 
+                    return name.endsWith(".jpg") || name.endsWith(".pgm") || name.endsWith(".png"); 
+                } 
+            }; 
+            
+        	String fileDir = "img/usuarioAdrian/oldFaces";
+        	File root = new File(fileDir); 
+        	boolean esFalsoPositivo = false;
+    		for (File imageFile: root.listFiles(imgFilter)) {
+    			if(compareImage(imageFile, saveFile)){
+    				Imgcodecs.imwrite("img/usuarioAdrian/falsesPositivesImages/img"+numImagen+"cara"+caras+".jpg", frameFinal);
+    				esFalsoPositivo = true;
+    				break;
+    			}
+    		}	
+    		
+    		if(!esFalsoPositivo){
+    			Imgcodecs.imwrite("img/usuarioAdrian/goodImages/img"+numImagen+"cara"+caras+".jpg", frameFinal);
+    		}
+    		*/
 
         } 
     }
@@ -72,6 +103,33 @@ public class ReconocimientoFacialPrueba {
 	    ImageIO.write(dest, "JPG", output);
 	    output.close();
 	}
-	 
+	
+    private boolean compareImage(File fileA, File fileB) {        
+	    try {
+	        //take buffer data from botm image files //
+	        BufferedImage biA = ImageIO.read(fileA);
+	        DataBuffer dbA = biA.getData().getDataBuffer();
+	        int sizeA = dbA.getSize();                      
+	        BufferedImage biB = ImageIO.read(fileB);
+	        DataBuffer dbB = biB.getData().getDataBuffer();
+	        int sizeB = dbB.getSize();
+	        //compare data-buffer objects //
+	        if(sizeA == sizeB) {
+	            for(int i=0; i<sizeA; i++) { 
+	                if(dbA.getElem(i) != dbB.getElem(i)) {
+	                    return false;
+	                }
+	            }
+	            return true;
+	        }
+	        else {
+	            return false;
+	        }
+	    } 
+	    catch (Exception e) { 
+	        System.out.println("Failed to compare image files ...");
+	        return  false;
+	    }
+	}
 }
 

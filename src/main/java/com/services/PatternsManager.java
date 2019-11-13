@@ -1,10 +1,16 @@
 package com.services;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +22,7 @@ import com.model.alert.Alert;
 import com.model.event.Event;
 import com.model.socket.IEventsServer;
 import com.repository.IPCameraRepository;
+import com.repository.ImageFalsePositiveRepository;
 import com.repository.MatchRepository;
 import com.repository.PersonRepository;
 
@@ -35,35 +42,42 @@ public class PatternsManager {
 	private InsertDataService insertDataService;
 	
 	@Autowired
+	private ImageFalsePositiveRepository imageFalsePositiveRepository;
+	
+	@Autowired
 	private IEventsServer eventServer;
+	
+	//private Map<String, List<ImageFalsePositive>> imagesFalsePositiveByDevice = new HashMap<String, List<ImageFalsePositive>>();
+	private Map<String, File[]> imagesFalsePositiveByDevice = new HashMap<String, File[]>();
 	
 	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
 	
 	public void find(IPCamera ipCamera, long personId, Date fecha){
-		if(ipCamera.getName().equals("F-CAM-VF-1")){
-			System.out.println("SUU");
-		}
 		Match match = saveMatch(ipCamera, personId, fecha);
 		searchPattern(match.getPerson());
 	}
 	
 	private Match saveMatch(IPCamera ipCameraModel, long personId, Date date){
 		
-	    String personName = "person"+ personId;
-	    System.out.println("PERSON NAME -> "+personName+", CAMERA NAME: ->"+ipCameraModel.getName());
-		Person person = personRepository.findByName(personName);
+		Match match = getMatch(ipCameraModel, personId, date);
 		
-		IPCamera ipCamera = ipCameraRepository.findByName(ipCameraModel.getName());
-		Match match = new Match(ipCamera, person, date);
-		
-		Match macthFind = matchRepository.findByCameraPerson(ipCamera.getId(), person.getId());
+		Match macthFind = matchRepository.findByCameraPerson(match.getIpCamera().getId(), match.getPerson().getId());
 		if(macthFind!=null) {
-			matchRepository.updateMatch(date, ipCamera.getId(), person.getId());
+			matchRepository.updateMatch(date, match.getIpCamera().getId(), match.getPerson().getId());
 		}
 		else {
 			matchRepository.save(match);
 		}		
 		
+		return match;
+	}
+	
+	public Match getMatch(IPCamera ipCameraModel, long personId, Date date){
+		String personName = "person"+ personId;
+		Person person = personRepository.findByName(personName);
+		
+		IPCamera ipCamera = ipCameraRepository.findByName(ipCameraModel.getName());
+		Match match = new Match(ipCamera, person, date);
 		return match;
 	}
 	
@@ -116,6 +130,44 @@ public class PatternsManager {
 		}
 		
 		
+	}
+	
+	public boolean isImageFalsePositive(IPCamera ipCamera, File newImage){
+		File[] imagesFalsePositive = insertDataService.getImagesFalsePostive().get(ipCamera.getDeviceId());
+    	for (File imageFalsePositive : imagesFalsePositive) {
+			if(compareImage(imageFalsePositive, newImage)){
+				return true;
+			}
+		}
+    	return false;
+    }
+	
+	private boolean compareImage(File fileA, File fileB) {        
+	    try {
+	        //take buffer data from botm image files //
+	        BufferedImage biA = ImageIO.read(fileA);
+	        DataBuffer dbA = biA.getData().getDataBuffer();
+	        int sizeA = dbA.getSize();                      
+	        BufferedImage biB = ImageIO.read(fileB);
+	        DataBuffer dbB = biB.getData().getDataBuffer();
+	        int sizeB = dbB.getSize();
+	        //compare data-buffer objects //
+	        if(sizeA == sizeB) {
+	            for(int i=0; i<sizeA; i++) { 
+	                if(dbA.getElem(i) != dbB.getElem(i)) {
+	                    return false;
+	                }
+	            }
+	            return true;
+	        }
+	        else {
+	            return false;
+	        }
+	    } 
+	    catch (Exception e) { 
+	        System.out.println("Failed to compare image files ...");
+	        return  false;
+	    }
 	}
 	
 	
