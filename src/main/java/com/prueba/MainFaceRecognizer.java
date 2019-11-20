@@ -9,7 +9,7 @@ public class MainFaceRecognizer {
 		train.run();
 		
 		long inicio = System.currentTimeMillis();
-		train.test("img/test/img284cara2.jpg");
+		//train.test("img/test/img284cara2.jpg");
 		long end = System.currentTimeMillis();
 		long result = end-inicio;
 		System.out.println("TIME: "+result);

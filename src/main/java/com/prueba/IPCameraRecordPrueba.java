@@ -17,6 +17,7 @@ import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import com.smarthings.IPCamerasManager;
+import com.trainning.Entrenar;
 
 public class IPCameraRecordPrueba implements Runnable{
 	
@@ -32,10 +33,13 @@ public class IPCameraRecordPrueba implements Runnable{
 	
 	@Override
 	public void run() {
+		Entrenar entrenar = new Entrenar();
+		entrenar.run();
+		
 		List<String> videosURL = new ArrayList<String>();
 		//videosURL.add("https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=uuYSRuIQes11cDLuctcyJ");
 		//videosURL.add("https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=FN-9de7BuTSXT8XaNK25J");
-		videosURL.add("https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=AJFFQBkqW9CEhb1sVhSBJ");
+		videosURL.add("https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=unuSwZDaJvQlHXP0pmxOJ");
 		int cont = 1;
 		for (String videoURL : videosURL) {
 			try {
@@ -58,7 +62,7 @@ public class IPCameraRecordPrueba implements Runnable{
 					
 					Mat frame_gray = new Mat();
 					
-					this.reconocimientoFacialPrueba.reconocerRostroYGuardar(cont, frame, frame_gray);
+					this.reconocimientoFacialPrueba.reconocerRostroYGuardar(cont, frame, frame_gray, entrenar);
 					
 					cont++;
 				}

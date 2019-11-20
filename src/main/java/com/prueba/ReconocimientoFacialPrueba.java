@@ -12,6 +12,7 @@ import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.math3.util.Pair;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
@@ -22,6 +23,7 @@ import org.opencv.objdetect.CascadeClassifier;
 
 import com.model.IPCamera;
 import com.model.ImageFalsePositive;
+import com.trainning.Entrenar;
 
 public class ReconocimientoFacialPrueba {
 	 
@@ -36,7 +38,7 @@ public class ReconocimientoFacialPrueba {
     }
 
     
-    public void reconocerRostroYGuardar(int numImagen, Mat frame, Mat frame_gray) throws Exception{
+    public void reconocerRostroYGuardar(int numImagen, Mat frame, Mat frame_gray, Entrenar entrenar) throws Exception{
     	Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
         Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
         double w = frame.width();
@@ -61,6 +63,14 @@ public class ReconocimientoFacialPrueba {
     		
     		//Se guarda la imagen
     		Imgcodecs.imwrite(srcSalida, frameFinal);
+    		
+    		/*Pair<Integer, Double> personPair = entrenar.test(srcSalida);
+    		
+    		if(personPair!=null){
+    			long personId = (long) personPair.getFirst();//La id es la label
+    			Imgcodecs.imwrite("img/test/reconocidos/img"+numImagen+"cara"+caras+".jpg", frameFinal);
+    			
+    		}*/
     		
     		//----
     		

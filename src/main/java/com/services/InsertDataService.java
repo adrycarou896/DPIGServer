@@ -1,13 +1,10 @@
 package com.services;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +16,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
-import com.model.ImageFalsePositive;
 import com.model.Person;
 import com.model.alert.Alert;
 import com.model.event.Event;
 import com.model.event.EventComplex;
 import com.model.event.EventSimple;
-import com.model.trainning.ImageSample;
 import com.reader.ReadProperties;
 import com.repository.IPCameraRepository;
 import com.repository.ImageFalsePositiveRepository;
@@ -37,7 +32,7 @@ import com.smarthings.IPCamerasManager;
 public class InsertDataService {
 	
 	private static final int NUM_PERSONS = 2;
-	private static final int NUM_CAMERAS = 4;
+	private static final int NUM_CAMERAS = 2;
 	
 	@Autowired
 	private IPCameraRepository ipCameraRepository;
@@ -50,7 +45,8 @@ public class InsertDataService {
 	
 	private List<Event> events = new ArrayList<Event>();
 	private List<Alert> alerts = new ArrayList<Alert>();
-	private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
+	
+	//private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
 		  
 	@PostConstruct
 	public void init() {
@@ -71,7 +67,7 @@ public class InsertDataService {
 				personRepository.save(person);
 			}
 			
-			saveFalsesPositivesImages();
+			//saveFalsesPositivesImages();
 			
 			data = properties.readPropertiesFile();
 			//GENERAR EVENTOS Y ALERTAS (REGLAS)
@@ -84,6 +80,7 @@ public class InsertDataService {
 		
 	}
 	
+	/*
 	private void saveFalsesPositivesImages(){
 		//Recoger todas las imágenes de la carpeta donde las guardo
 		FilenameFilter imgFilter = new FilenameFilter() { 
@@ -105,7 +102,7 @@ public class InsertDataService {
 	
 	public Map<String, File[]> getImagesFalsePostive() {
 		return imagesFalsePostive;
-	}
+	}*/
 
 	private void generateEvents(Map<String,Object> data){
 		Map<String,String> events = (Map<String,String>)data.get("events");

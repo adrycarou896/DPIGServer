@@ -132,6 +132,7 @@ public class PatternsManager {
 		
 	}
 	
+	/*
 	public boolean isImageFalsePositive(IPCamera ipCamera, File newImage){
 		File[] imagesFalsePositive = insertDataService.getImagesFalsePostive().get(ipCamera.getDeviceId());
     	for (File imageFalsePositive : imagesFalsePositive) {
@@ -169,6 +170,7 @@ public class PatternsManager {
 	        return  false;
 	    }
 	}
+	*/
 	
 	
 }

@@ -2,7 +2,6 @@ package com.services;
 
 import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
-import com.model.Match;
-import com.repository.ImageFalsePositiveRepository;
 import com.trainning.Entrenar;
 
 @Service
@@ -37,9 +34,6 @@ public class ReconocimientoFacial {
     
     @Autowired
     private PatternsManager patternsManager;
-    
-    @Autowired
-	private ImageFalsePositiveRepository imageFalsePositiveRepository;
     
     private Map<String, List<String>> personsEncontradas;
     
@@ -101,44 +95,27 @@ public class ReconocimientoFacial {
 				
 				//Se guarda la imagen
 	    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
-				
-	    		if(!patternsManager.isImageFalsePositive(ipCamera, new File(rutaImagen))){
-					//System.out.println("NO ES UN FALSO POSITIVO -> personId: "+ipCamera.getId());
 					
-		    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
-		    		
-		    		if(personPair!=null){
-		    			long personId = (long) personPair.getFirst();//La id es la label
-		    			
-						boolean sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
-						//Cuando cambie de device se ejecuta el find
-		    			if(!sigueEnElMismoDevice){
-		    				//Imgcodecs.imwrite("img/frames/"+match.getIpCamera().getName()+".jpg", frameAdecuado);
-		    				//-->Probar si las imagenes que recoge son iguales que las recogidas en el entrenamiento.
-		    				
-	    					//Actualizar el contador de veces encontrado para cada persona
-							if(!imagenesIdentificadas.containsKey(personId)){
-								imagenesIdentificadas.put(personId, 1);
-							}
-							else{
-								imagenesIdentificadas.replace(personId, imagenesIdentificadas.get(personId)+1);
-							} 
-	    					if(imagenesIdentificadas.get(personId)==1){
-	    						imagenesIdentificadas.replace(personId, 0);
-	    						
-								personsEncontradas.get(ipCamera.getDeviceId()).remove(0);
-								
-								Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
-			    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
-			    		    	
-			    		    	this.patternsManager.find(device, personId, new Date());
-			    		    	
-			    		    	return personId;
-	    					}
-		    			}
-				    }
-				}
+	    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
 	    		
+	    		if(personPair!=null){
+	    			long personId = (long) personPair.getFirst();//La id es la label
+	    			
+					boolean sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
+					//Cuando cambie de device se ejecuta el find
+	    			if(!sigueEnElMismoDevice){
+    						imagenesIdentificadas.replace(personId, 0);
+    						
+							personsEncontradas.get(ipCamera.getDeviceId()).remove(0);
+							
+							Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
+		    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
+		    		    	
+		    		    	this.patternsManager.find(device, personId, new Date());
+		    		    	
+		    		    	return personId;
+	    			}
+			    }
 	    	}
    		} 
 		else{
