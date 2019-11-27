@@ -23,3 +23,14 @@ https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac505
 
 papa2:
 https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=unuSwZDaJvQlHXP0pmxOJ
+
+mama1:
+https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=3hvfRAnaIwlAakE00jclJ
+
+--------------
+
+Yo1:
+https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=pe4GYueIceazQZ35jC3zJ
+
+Yo2: -> Con este se ha hecho el reconocimiento para el usuario1
+https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=yGrPSw2hI67SgMF3ZZ0dJ

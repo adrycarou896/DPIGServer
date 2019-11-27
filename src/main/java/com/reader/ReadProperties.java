@@ -10,12 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.utils.Util;
+
 public class ReadProperties {
 	
 	private Map<String, String> events;
 	private Map<String,String> alerts;
 	
-	private static final String FILEPATH="src/main/resources/rules.properties";
 	private BufferedReader bf;
 	
 	public Map<String,Object> readPropertiesFile() throws FileNotFoundException, IOException {
@@ -25,7 +26,7 @@ public class ReadProperties {
 		events = new HashMap<String, String>();
 		alerts = new HashMap<String, String>();
 		
-		try (InputStream input = new FileInputStream(FILEPATH)) {
+		try (InputStream input = new FileInputStream(Util.RULES_FILE_PATH)) {
 			Properties prop = new Properties();
             prop.load(input);
             
@@ -49,7 +50,7 @@ public class ReadProperties {
 	
 	private int numberOfLines() throws IOException {
 		
-		FileReader fr = new FileReader(FILEPATH);
+		FileReader fr = new FileReader(Util.RULES_FILE_PATH);
 		bf = new BufferedReader(fr);
 		int lNumeroLineas = 0;
 		while ((bf.readLine())!=null) {

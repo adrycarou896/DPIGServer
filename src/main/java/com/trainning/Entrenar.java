@@ -14,15 +14,16 @@ import org.apache.commons.math3.util.Pair;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_face.EigenFaceRecognizer;
+import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
+import org.bytedeco.javacpp.opencv_face.LBPHFaceRecognizer;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import com.model.trainning.ImageSample;
+import com.utils.Util;
 
 public class Entrenar implements Runnable{
 	
 	private EigenFaceRecognizer eigenFaceRecognizer;
-	
-	public static final int NUMERO_DE_USUARIOS = 2;
 	
 	private double mayor = 0.0;
 	
@@ -41,11 +42,13 @@ public class Entrenar implements Runnable{
 	
 	@Override
 	public void run() {
+        
+        String[] personsNames = Util.getPersonsNames();
+        
+		String [] trainingDirs = new String[personsNames.length];
 		
-		String [] trainingDirs = new String[NUMERO_DE_USUARIOS];
-		
-		for (int i = 0; i < NUMERO_DE_USUARIOS; i++) {
-			trainingDirs[i] = "img/usuario"+i;
+		for (int i = 0; i < trainingDirs.length; i++) {
+			trainingDirs[i] = Util.FOLDERS_USERS_PATH+"/"+personsNames[i];
 		}
 		
 		train(trainingDirs);
@@ -70,7 +73,7 @@ public class Entrenar implements Runnable{
  
 			File root = new File(trainingDir); 
 			for (File imageFile: root.listFiles(imgFilter)) {
-				imageSamples.add(new ImageSample(imageFile, label));
+				imageSamples.add(new ImageSample(imageFile, label+1));
 			}			
 		}
 		
@@ -115,9 +118,9 @@ public class Entrenar implements Runnable{
 		 }
 		 //LBPH -> <100
 		 //Eigen -> <1000
-		 //System.out.println("CONF: "+confidences[0]);
-		 if(confidences[0]<1000){
-			 //System.out.println("RECONOCIDO: "+confidences[0] + " id: "+enteros[0]);
+		 System.out.println("CONF: "+confidences[0]);
+		 if(confidences[0]<700){
+			 System.out.println("RECONOCIDO: "+confidences[0] + " id: "+enteros[0]);
 			 //System.out.println("MENOR: " + menor); 
 	    	 //System.out.println("MAYOR: " + mayor); 
 	    	 //System.out.println("Confidences--------------------->: "+confidences[0]);

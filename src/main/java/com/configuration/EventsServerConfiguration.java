@@ -11,6 +11,7 @@ import com.model.socket.IEventsServer;
 import com.services.IPCamerasRecord;
 import com.smarthings.IPCamerasManager;
 import com.trainning.Entrenar;
+import com.utils.Util;
 
 @Configuration
 public class EventsServerConfiguration {
@@ -41,7 +42,7 @@ public class EventsServerConfiguration {
 	            executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						System.load("C:\\opencv\\build\\java\\x64\\opencv_java400.dll");
+						System.load(Util.LOAD_OPENCV_PATH);
 						
 						Entrenar train = new Entrenar();
 						train.run();

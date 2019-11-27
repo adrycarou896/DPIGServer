@@ -1,16 +1,10 @@
 package com.services;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +16,6 @@ import com.model.alert.Alert;
 import com.model.event.Event;
 import com.model.socket.IEventsServer;
 import com.repository.IPCameraRepository;
-import com.repository.ImageFalsePositiveRepository;
 import com.repository.MatchRepository;
 import com.repository.PersonRepository;
 
@@ -42,15 +35,15 @@ public class PatternsManager {
 	private InsertDataService insertDataService;
 	
 	@Autowired
-	private ImageFalsePositiveRepository imageFalsePositiveRepository;
-	
-	@Autowired
 	private IEventsServer eventServer;
 	
-	//private Map<String, List<ImageFalsePositive>> imagesFalsePositiveByDevice = new HashMap<String, List<ImageFalsePositive>>();
-	private Map<String, File[]> imagesFalsePositiveByDevice = new HashMap<String, File[]>();
-	
 	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
+	
+	//@Autowired
+	//private ImageFalsePositiveRepository imageFalsePositiveRepository;
+	
+	//private Map<String, List<ImageFalsePositive>> imagesFalsePositiveByDevice = new HashMap<String, List<ImageFalsePositive>>();
+	//private Map<String, File[]> imagesFalsePositiveByDevice = new HashMap<String, File[]>();
 	
 	public void find(IPCamera ipCamera, long personId, Date fecha){
 		Match match = saveMatch(ipCamera, personId, fecha);
@@ -73,10 +66,11 @@ public class PatternsManager {
 	}
 	
 	public Match getMatch(IPCamera ipCameraModel, long personId, Date date){
-		String personName = "person"+ personId;
-		Person person = personRepository.findByName(personName);
+		//String personName = "person"+ personId;
+		Person person = personRepository.findPersonById(personId);
+		//Person person = personRepository.findByName(personName);
 		
-		IPCamera ipCamera = ipCameraRepository.findByName(ipCameraModel.getName());
+		IPCamera ipCamera = ipCameraRepository.findByIPCameraId(ipCameraModel.getId());
 		Match match = new Match(ipCamera, person, date);
 		return match;
 	}

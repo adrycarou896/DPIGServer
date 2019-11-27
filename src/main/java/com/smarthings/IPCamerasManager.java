@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.model.IPCamera;
+import com.utils.Util;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,7 +34,7 @@ public class IPCamerasManager {
 	    URL url = new URL(fileUrl);
 	    
 	    URLConnection connection = url.openConnection();
-	    connection.setRequestProperty("Authorization", "Bearer 82c908bc-daec-4b43-b643-08b90273923e");
+	    connection.setRequestProperty("Authorization", "Bearer "+Util.SMARTTHINGS_TOKEN);
 	   
 	    InputStream is = connection.getInputStream();
 	    OutputStream os = new FileOutputStream(destinationFile);
@@ -52,7 +53,7 @@ public class IPCamerasManager {
 	
 	public String getDeviceURLImage(String deviceId) throws IOException{
 		
-		JSONObject responseJSON = getSimpleRequest("https://api.smartthings.com/v1/devices/"+deviceId+"/status");
+		JSONObject responseJSON = getSimpleRequest(Util.SMARTTHINGS_DEVICES+"/"+deviceId+"/status");
 		
 		JSONObject componentsJSON = new JSONObject(responseJSON.get("components").toString());
 		JSONObject mainJSON = new JSONObject(componentsJSON.get("main").toString());
@@ -80,7 +81,7 @@ public class IPCamerasManager {
 	
 	public JSONArray getJSONDevices() throws IOException {
 		
-		JSONObject responseJSON = getSimpleRequest("https://api.smartthings.com/v1/devices");
+		JSONObject responseJSON = getSimpleRequest(Util.SMARTTHINGS_DEVICES);
 
 		JSONArray devices = new JSONArray(responseJSON.get("items").toString());
 		return devices;
@@ -91,7 +92,7 @@ public class IPCamerasManager {
 		OkHttpClient client = new OkHttpClient();
 		
 		Request request = new Request.Builder()
-			    .header("Authorization", "Bearer 82c908bc-daec-4b43-b643-08b90273923e")
+			    .header("Authorization", "Bearer "+Util.SMARTTHINGS_TOKEN)
 			    .url(url)
 			    .build();
 
@@ -103,7 +104,7 @@ public class IPCamerasManager {
 	
 	public String getVideoURL(String deviceId) throws IOException{
 		
-		JSONObject responseJSON = getSimpleRequest("https://api.smartthings.com/v1/devices/"+deviceId+"/status");
+		JSONObject responseJSON = getSimpleRequest(Util.SMARTTHINGS_DEVICES+"/"+deviceId+"/status");
 		
 		JSONObject componentsJSON = new JSONObject(responseJSON.get("components").toString());
 		JSONObject mainJSON = new JSONObject(componentsJSON.get("main").toString());

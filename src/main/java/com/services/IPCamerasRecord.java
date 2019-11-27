@@ -17,6 +17,7 @@ import com.reader.ReadVideoFrames;
 import com.repository.IPCameraRepository;
 import com.smarthings.IPCamerasManager;
 import com.trainning.Entrenar;
+import com.utils.Util;
 
 @Service
 public class IPCamerasRecord implements Runnable{
@@ -45,21 +46,8 @@ public class IPCamerasRecord implements Runnable{
 	
 	public void setConf(IPCamerasManager ipCamerasManager, Entrenar entrenamiento){
 		this.reconocimientoFacial.setConf(entrenamiento);
-		
 		this.ipCamerasManager = ipCamerasManager;
-		
 		this.deviceIdVideoURL = new HashMap<String, String>();
-		
-		
-		/*
-		orderList = new ArrayList<String>();
-		orderList.add("Camera");
-		orderList.add("F-CAM-VF-1");
-		orderList.add("Camera");
-		//this.orderList.add("Camera4");
-		*/
-		
-		
 	}
 	
 	public Map<String, List<Long>> getDevicePersons(){
@@ -118,13 +106,14 @@ public class IPCamerasRecord implements Runnable{
 					videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
 				}*/
 				
-				videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=Cv83kQX9DvI0Gaa509clJ";
+				videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=3hvfRAnaIwlAakE00jclJ";
 				if(videoURL!=null){
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
 //					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ CORRECTO
 						cont++;
-						String videoFile = "img/videoFrames/"+device.getName()+".mp4";
+						String videoFile = Util.FOLDER_CAMERAS_PATH+"/"+"Camera"+"/Video/"+"Camera"+".mp4";//<--Cambiar por el de abajo
+						//String videoFile = Util.FOLDER_CAMERAS_PATH+"/"+device.getName()+"/Video/"+device.getName()+".mp4";
 						ipCamerasManager.saveFile(videoURL, videoFile);
 						
 						ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFile);

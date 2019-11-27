@@ -23,16 +23,13 @@ import com.model.event.EventComplex;
 import com.model.event.EventSimple;
 import com.reader.ReadProperties;
 import com.repository.IPCameraRepository;
-import com.repository.ImageFalsePositiveRepository;
 import com.repository.PersonRepository;
 import com.smarthings.IPCamerasManager;
+import com.utils.Util;
 
 @Service
 @Scope("singleton")
 public class InsertDataService {
-	
-	private static final int NUM_PERSONS = 2;
-	private static final int NUM_CAMERAS = 2;
 	
 	@Autowired
 	private IPCameraRepository ipCameraRepository;
@@ -40,12 +37,12 @@ public class InsertDataService {
 	@Autowired
 	private PersonRepository personRepository;
 	
-	@Autowired
-	private ImageFalsePositiveRepository imageFalsePositiveRepository;
-	
 	private List<Event> events = new ArrayList<Event>();
 	private List<Alert> alerts = new ArrayList<Alert>();
 	
+	//private static final int NUM_CAMERAS = 2;
+	//@Autowired
+	//private ImageFalsePositiveRepository imageFalsePositiveRepository;
 	//private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
 		  
 	@PostConstruct
@@ -62,8 +59,10 @@ public class InsertDataService {
 				ipCameraRepository.save(device);
 			}
 			
-			for (int i = 0; i < NUM_PERSONS; i++) {
-				Person person = new Person("person"+i);
+			String[] personsNames = Util.getPersonsNames();
+			 
+			for (int i = 0; i < personsNames.length; i++) {
+				Person person = new Person(personsNames[i]);
 				personRepository.save(person);
 			}
 			
@@ -77,32 +76,7 @@ public class InsertDataService {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		
 	}
-	
-	/*
-	private void saveFalsesPositivesImages(){
-		//Recoger todas las imágenes de la carpeta donde las guardo
-		FilenameFilter imgFilter = new FilenameFilter() { 
-			public boolean accept(File dir, String name) { 
-                name = name.toLowerCase(); 
-                return name.endsWith(".jpg") || name.endsWith(".pgm") || name.endsWith(".png"); 
-            } 
-        }; 
-        
-        for (int i = 1; i <= NUM_CAMERAS; i++) {
-        	long ipCameraId = i;
-        	IPCamera ipCamera = ipCameraRepository.findByIPCameraId(ipCameraId);
-        	String ipCameraName = ipCamera.getName();
-        	String fileDir = "img/falsesPositivesImages/"+ipCameraName;
-        	File root = new File(fileDir); 
-        	this.imagesFalsePostive.put(ipCamera.getDeviceId(), root.listFiles(imgFilter));
-		}	
-	}
-	
-	public Map<String, File[]> getImagesFalsePostive() {
-		return imagesFalsePostive;
-	}*/
 
 	private void generateEvents(Map<String,Object> data){
 		Map<String,String> events = (Map<String,String>)data.get("events");
@@ -212,6 +186,11 @@ public class InsertDataService {
 						alertsToRun.add(alert);
 					}
 				}
+				else if(alert.getOperator().equals("min")){
+					if(actualDate.before(alertDate)) {
+						alertsToRun.add(alert);
+					}
+				}
 				
 			}
 		}
@@ -225,4 +204,28 @@ public class InsertDataService {
 	public List<Alert> getAlerts(){
 		return this.alerts;
 	}
+	
+	/*
+	private void saveFalsesPositivesImages(){
+		//Recoger todas las imágenes de la carpeta donde las guardo
+		FilenameFilter imgFilter = new FilenameFilter() { 
+			public boolean accept(File dir, String name) { 
+                name = name.toLowerCase(); 
+                return name.endsWith(".jpg") || name.endsWith(".pgm") || name.endsWith(".png"); 
+            } 
+        }; 
+        
+        for (int i = 1; i <= NUM_CAMERAS; i++) {
+        	long ipCameraId = i;
+        	IPCamera ipCamera = ipCameraRepository.findByIPCameraId(ipCameraId);
+        	String ipCameraName = ipCamera.getName();
+        	String fileDir = "img/falsesPositivesImages/"+ipCameraName;
+        	File root = new File(fileDir); 
+        	this.imagesFalsePostive.put(ipCamera.getDeviceId(), root.listFiles(imgFilter));
+		}	
+	}
+	
+	public Map<String, File[]> getImagesFalsePostive() {
+		return imagesFalsePostive;
+	}*/
 }

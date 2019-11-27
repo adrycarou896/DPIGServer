@@ -8,12 +8,10 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JOptionPane;
+
+import com.utils.Util;
 
 public class AcctionBotonRestablecerNombres implements ActionListener{
 	
@@ -36,10 +34,10 @@ public class AcctionBotonRestablecerNombres implements ActionListener{
 	            } 
 	        }; 
 	        
-	        String userFolderPath = "img/Cameras/"+cameraSelectedName+"/Frames/"+userName;
+	        String userFolderPath = Util.FOLDER_CAMERAS_PATH+"/"+cameraSelectedName+"/Frames/"+userName;
 	        File userFolder = new File(userFolderPath); 
 	        
-	        String userMainFolderPath = "img/users/"+userName;
+	        String userMainFolderPath = Util.FOLDERS_USERS_PATH+"/"+userName;
 	        File userMainFolder = new File(userMainFolderPath);
 	        if(!userMainFolder.exists()){
 	        	 userMainFolder.mkdirs();
@@ -55,7 +53,7 @@ public class AcctionBotonRestablecerNombres implements ActionListener{
 	        
 	        int cont = userMainImages.length+1;
 	        for (File userImage : userFolder.listFiles(imgFilter)) {
-	        	String copyImagePath = folderCopyPath+"/"+userName+"_img"+cont+".jpg";
+	        	String copyImagePath = folderCopyPath+"/"+cameraSelectedName+"_img"+cont+".jpg";
         		try{
 	        		FileInputStream fis = new FileInputStream(userImage); //inFile -> Archivo a copiar
 	        		FileOutputStream fos = new FileOutputStream(copyImagePath); //outFile -> Copia del archivo
@@ -75,7 +73,7 @@ public class AcctionBotonRestablecerNombres implements ActionListener{
 	        
 	        cont = userMainImages.length+1;
 	        for (File userImageCopy : folderCopy.listFiles(imgFilter)) {
-	        	String newUserImagePath = userFolderPath+"/"+userName+"_img"+cont+".jpg";
+	        	String newUserImagePath = userFolderPath+"/"+cameraSelectedName+"_img"+cont+".jpg";
 	        	
 	        	try{
 	        		FileInputStream fis = new FileInputStream(userImageCopy); //inFile -> Archivo a copiar
@@ -98,19 +96,6 @@ public class AcctionBotonRestablecerNombres implements ActionListener{
 		else{
 			JOptionPane.showMessageDialog(null, "Usuario no especificado");
 		}
-	}
-	
-	private List<File> orderList(File[] images, String usuarioName){
-		List<File> imagesInOrder = new ArrayList<File>();
-		for (int i = 0; i < images.length; i++) {
-			imagesInOrder.add(new File(""));
-		}
-		for (File file : images) {
-			String finalImagePart =  file.getAbsolutePath().split(usuarioName+"_img")[1];
-			int pos = Integer.parseInt(finalImagePart.split(".jpg")[0]);
-			imagesInOrder.add(pos, file);
-		}
-		return imagesInOrder;
 	}
 	
 	

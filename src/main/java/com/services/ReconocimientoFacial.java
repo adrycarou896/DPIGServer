@@ -21,14 +21,14 @@ import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
 import com.trainning.Entrenar;
+import com.utils.Util;
 
 @Service
 public class ReconocimientoFacial {
 	 
-    private String RutaDelCascade = "C:\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt2.xml";
     private CascadeClassifier Cascade;
     
-    private MatOfRect rostros;//Guarda los rostros que va capturando
+    private MatOfRect rostros;
     
     private Entrenar entrenamiento;
     
@@ -42,7 +42,7 @@ public class ReconocimientoFacial {
     private Map<String, List<Long>> devicePersons;
     
     public void setConf(Entrenar entrenamiento){
-    	this.Cascade = new CascadeClassifier(RutaDelCascade);
+    	this.Cascade = new CascadeClassifier(Util.CASCADE_PATH);
     	this.rostros = new MatOfRect();
     	
     	this.entrenamiento = entrenamiento;
@@ -59,7 +59,7 @@ public class ReconocimientoFacial {
     }
     
     public void setConf(){
-    	this.Cascade = new CascadeClassifier(RutaDelCascade);
+    	this.Cascade = new CascadeClassifier(Util.CASCADE_PATH);
     	this.rostros = new MatOfRect();
     }
     
