@@ -118,7 +118,7 @@ public class Entrenar implements Runnable{
 		 }
 		 //LBPH -> <100
 		 //Eigen -> <1000
-		 System.out.println("CONF: "+confidences[0]);
+		 //System.out.println("CONF: "+confidences[0]);
 		 if(confidences[0]<700){
 			 System.out.println("RECONOCIDO: "+confidences[0] + " id: "+enteros[0]);
 			 //System.out.println("MENOR: " + menor); 
