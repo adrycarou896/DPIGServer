@@ -47,7 +47,6 @@ public class Person implements Serializable {
 	
 	public JSONObject getJson() {
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("name", this.id);
 		jsonObject.put("name", this.name);
 		return jsonObject;
 	}

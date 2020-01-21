@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 import com.model.IPCamera;
 import com.model.Match;
 import com.model.Person;
-import com.model.alert.Alert;
-import com.model.event.Event;
-import com.model.socket.IEventsServer;
+import com.model.rule.alert.Alert;
+import com.model.rule.event.Event;
 import com.repository.IPCameraRepository;
 import com.repository.MatchRepository;
 import com.repository.PersonRepository;
+import com.socket.IEventsServer;
 
 @Service
 public class PatternsManager {
@@ -101,9 +101,9 @@ public class PatternsManager {
 			List<Event> personEventsSaved = this.lastEventPersons.get(person.getName());
 			if(personEventsSaved!=null){
 				if(!personEventsSaved.contains(event)){
-					if(event.getDate().before(personEventsSaved.get(0).getDate())){
+					/*if(event.getDate().before(personEventsSaved.get(0).getDate())){
 						personEventsSaved.clear();
-					}
+					}*/
 					personEventsSaved.add(event);
 					eventServer.sendData(person,event);	
 				}
@@ -120,6 +120,7 @@ public class PatternsManager {
 			List<Alert> eventAlerts = insertDataService.getAlertByEvent(event);
 			for (Alert alert : eventAlerts) {
 				System.out.println("Alert->"+alert.getName());
+				eventServer.sendData(person, alert);
 			}
 		}
 		

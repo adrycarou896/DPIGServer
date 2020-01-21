@@ -18,7 +18,6 @@ import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
 import org.bytedeco.javacpp.opencv_face.LBPHFaceRecognizer;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
-import com.model.trainning.ImageSample;
 import com.utils.Util;
 
 public class Entrenar implements Runnable{

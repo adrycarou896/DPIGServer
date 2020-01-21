@@ -14,8 +14,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import com.model.Person;
-import com.model.event.Event;
-import com.model.socket.IEventsServer;
+import com.model.rule.Rule;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.INTERFACES)
@@ -40,14 +39,14 @@ public class EventsServer implements Runnable, IEventsServer {
 	}
 
 	@Override
-	public synchronized void sendData(Person person, Event event) {
+	public synchronized void sendData(Person person, Rule rule) {
 		try {
 			for (Socket s: connections) {
 				if (!s.isClosed()) {
 					ObjectOutputStream output =  new ObjectOutputStream(s.getOutputStream());
 					JSONObject dataJSON = new JSONObject();
 			    	dataJSON.put("person", person.getJson());
-			    	dataJSON.put("event", event.getJson());
+			    	dataJSON.put(rule.getType(), rule.getJson());
 			    	output.writeObject(dataJSON.toString());
 				}
 				else {
@@ -63,4 +62,6 @@ public class EventsServer implements Runnable, IEventsServer {
 		//En el sendMessage enviar el mensaje a todas los outputstream registrados
 		//Detectar sockets cerrados y borrar el outputstream
 	}
+	
+	
 }

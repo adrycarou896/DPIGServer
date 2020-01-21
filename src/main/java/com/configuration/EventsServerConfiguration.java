@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
-import com.model.socket.IEventsServer;
 import com.services.IPCamerasRecord;
 import com.smarthings.IPCamerasManager;
+import com.socket.IEventsServer;
 import com.trainning.Entrenar;
 import com.utils.Util;
 

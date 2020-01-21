@@ -3,7 +3,6 @@ package com.services;
 import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
@@ -32,28 +30,12 @@ public class ReconocimientoFacial {
     
     private Entrenar entrenamiento;
     
-    @Autowired
-    private PatternsManager patternsManager;
-    
-    private Map<String, List<String>> personsEncontradas;
-    
-    private List<String> orderList;
-    
     private Map<String, List<Long>> devicePersons;
     
     public void setConf(Entrenar entrenamiento){
     	this.Cascade = new CascadeClassifier(Util.CASCADE_PATH);
     	this.rostros = new MatOfRect();
-    	
     	this.entrenamiento = entrenamiento;
-    	
-    	orderList = new ArrayList<String>();
-    	orderList.add("Camera");
-		orderList.add("F-CAM-VF-1");
-		orderList.add("Camera");
-		
-		this.personsEncontradas = new HashMap<String, List<String>>();
-		
 		this.devicePersons = new HashMap<>();
 		
     }
@@ -64,13 +46,6 @@ public class ReconocimientoFacial {
     }
     
     public long reconocer(IPCamera device, Mat frame, Mat frame_gray, int numIter, IPCamera ipCamera, Map<Long, Integer> imagenesIdentificadas) throws Exception{
-    	
-    	//NUEVO-PRUEBA
-		if(!personsEncontradas.containsKey(ipCamera.getDeviceId())){
-			personsEncontradas.put(ipCamera.getDeviceId(), orderList);
-		}
-		
-		if(personsEncontradas.get(ipCamera.getDeviceId()).size()>0 && personsEncontradas.get(ipCamera.getDeviceId()).get(0).equals(device.getName())){
 			
 			Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
 	        Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
@@ -104,23 +79,15 @@ public class ReconocimientoFacial {
 					boolean sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
 					//Cuando cambie de device se ejecuta el find
 	    			if(!sigueEnElMismoDevice){
-    						imagenesIdentificadas.replace(personId, 0);
-    						
-							personsEncontradas.get(ipCamera.getDeviceId()).remove(0);
-							
+    						imagenesIdentificadas.replace(personId, imagenesIdentificadas.get(personId)+1);
+						
 							Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
 		    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
-		    		    	
-		    		    	this.patternsManager.find(device, personId, new Date());
 		    		    	
 		    		    	return personId;
 	    			}
 			    }
 	    	}
-   		} 
-		else{
-			return -2;
-		}
      return -1;
     }
     

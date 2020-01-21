@@ -2,7 +2,9 @@ package com.services;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,19 +32,16 @@ public class IPCamerasRecord implements Runnable{
 	@Autowired
 	private ReconocimientoFacial reconocimientoFacial;
 	
-	private Map<String, String> deviceIdVideoURL;
+	@Autowired
+    private PatternsManager patternsManager;
 	
-	private int cont = 0;
+	private Map<String, String> deviceIdVideoURL;
 	
 	private IPCamera deviceWithImages;
 	
 	private int numIter = 0;
 	
 	private long start;
-	
-	//private Map<Long, List<String>> personsEncontradas;
-	
-	//private List<String> orderList;
 	
 	public void setConf(IPCamerasManager ipCamerasManager, Entrenar entrenamiento){
 		this.reconocimientoFacial.setConf(entrenamiento);
@@ -71,32 +70,8 @@ public class IPCamerasRecord implements Runnable{
 				List<BufferedImage> images = new ArrayList<BufferedImage>();
 				
 				String videoURL = ipCamerasManager.getVideoURL(device.getDeviceId());
-				/*//PRUEBAS
-				if(device.getName().equals("F-CAM-VF-1") && cont==1){
-					cont++;
-					
-					videoURL = "https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=2OXDxhX3--88LetXD6HBJ";
-					String videoFile = "img/videoFrames/"+device.getName()+".mp4";
-					ipCamerasManager.saveFile(videoURL, videoFile);
-					
-					DecodeAndCaptureFrames decodeAndCaptureFramesnew = new DecodeAndCaptureFrames(videoFile);
-					images = decodeAndCaptureFramesnew.getImages();
-					
-					for (BufferedImage image : images) {
-						Mat frame = bufferedImageToMat(image);
-						Mat frame_gray = new Mat();
-						this.reconocimientoFacial.reconocer(device, frame, frame_gray);
-						boolean encontrado = this.reconocimientoFacial.reconocer(device, frame, frame_gray);
-						if(encontrado){
-							break;
-						}
-					}
-					
-				}
-				*/
 				
-				//PRARA PRUEBA - Cada cámara analizada tendrá el ultimo video de Camera CORRECTO
-				/*if(videoURL!=null){
+				if(videoURL!=null){
 					if(deviceWithImages!=null){
 						videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
 					}
@@ -104,19 +79,24 @@ public class IPCamerasRecord implements Runnable{
 				else{
 					deviceWithImages = device;
 					videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
-				}*/
+				}
 				
-				videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=3hvfRAnaIwlAakE00jclJ";
+				//videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=3hvfRAnaIwlAakE00jclJ";
 				if(videoURL!=null){
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
-					String anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
-//					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ CORRECTO
-						cont++;
-						String videoFile = Util.FOLDER_CAMERAS_PATH+"/"+"Camera"+"/Video/"+"Camera"+".mp4";//<--Cambiar por el de abajo
-						//String videoFile = Util.FOLDER_CAMERAS_PATH+"/"+device.getName()+"/Video/"+device.getName()+".mp4";
-						ipCamerasManager.saveFile(videoURL, videoFile);
+					String anteriorVideoURL = null;
+					if(this.deviceIdVideoURL.containsKey(device.getDeviceId())){
+						anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
+					}
+					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ 
+						String videoFolderPath = Util.FOLDER_CAMERAS_PATH+"/"+device.getName()+"/Video/"+device.getName()+".mp4";
+						File videoFolder = new File(videoFolderPath);
+						videoFolder.mkdirs();
+						String videoFilePath = videoFolderPath + device.getName()+".mp4";
 						
-						ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFile);
+						ipCamerasManager.saveFile(videoURL, videoFilePath);
+						
+						ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFilePath);
 						images = decodeAndCaptureFramesnew.getImages();
 						
 						Map<Long, Integer> imagenesIdentificadas = new HashMap<Long, Integer>();
@@ -124,15 +104,14 @@ public class IPCamerasRecord implements Runnable{
 							Mat frame = bufferedImageToMat(image);
 							Mat frame_gray = new Mat();
 							long personIdEncontrada = this.reconocimientoFacial.reconocer(device, frame, frame_gray, numIter, device, imagenesIdentificadas);
-							if(personIdEncontrada==-2){
-								break;
-							}
-							if(personIdEncontrada!=-1){
+							if(personIdEncontrada!=-1 && imagenesIdentificadas.size()>=3){
 								long end = System.currentTimeMillis();
 								System.out.println("TIME: " + (end-start));
 								start = System.currentTimeMillis();
+								this.patternsManager.find(device, personIdEncontrada, new Date());
 								break;
 							}
+							
 						}
 						if(!this.deviceIdVideoURL.containsKey(device.getDeviceId())){
 							this.deviceIdVideoURL.put(device.getDeviceId(), videoURL);
@@ -141,10 +120,10 @@ public class IPCamerasRecord implements Runnable{
 							this.deviceIdVideoURL.replace(device.getDeviceId(), videoURL);
 						}
 						
-/*					}
+					}
 					else{
 						System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no se ha procesado por no detectar cambios");
-					} CORRECTO	*/	
+					} 	
 	    		}
 				else{
 					System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no tiene videos disponibles");

@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
 import com.model.Person;
-import com.model.alert.Alert;
-import com.model.event.Event;
-import com.model.event.EventComplex;
-import com.model.event.EventSimple;
+import com.model.rule.alert.Alert;
+import com.model.rule.event.Event;
+import com.model.rule.event.EventComplex;
+import com.model.rule.event.EventSimple;
 import com.reader.ReadProperties;
 import com.repository.IPCameraRepository;
 import com.repository.PersonRepository;
@@ -144,30 +144,42 @@ public class InsertDataService {
 	private Alert getAlert(String name, String value) {
 		String[] valueArray = value.split("-");
 		String eventName = valueArray[0];
-		String operator = valueArray[1];
-		
-		String dateString = valueArray[2];
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-		try {
+		Event event = getEvent(eventName);
+		if(event!=null){
+			String operator = valueArray[1];
 			
-			Calendar calActual = Calendar.getInstance(); 
-			calActual.setTime(new Date());
+			String dateString = valueArray[2];
+			SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+			try {
+				
+				Calendar calActual = Calendar.getInstance(); 
+				calActual.setTime(new Date());
 
-			int dayOfMonth = calActual.get(Calendar.DAY_OF_MONTH);
-			int month = calActual.get(Calendar.MONTH)+1;
-			int year = calActual.get(Calendar.YEAR);
-		
-			String[] dateArray = dateString.split(":");
-			int hours = Integer.parseInt(dateArray[0]);
-			int minutes = Integer.parseInt(dateArray[1]);
+				int dayOfMonth = calActual.get(Calendar.DAY_OF_MONTH);
+				int month = calActual.get(Calendar.MONTH)+1;
+				int year = calActual.get(Calendar.YEAR);
 			
-			format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			String dateAlertString = String.valueOf(year)+"-"+String.valueOf(month)+"-"+String.valueOf(dayOfMonth)+" "+String.valueOf(hours)+":"+String.valueOf(minutes);
-			Date dateAlert = format.parse(dateAlertString);
-			
-			return new Alert(name, eventName, operator, dateAlert);
-		} catch (ParseException e) {
-			e.printStackTrace();
+				String[] dateArray = dateString.split(":");
+				int hours = Integer.parseInt(dateArray[0]);
+				int minutes = Integer.parseInt(dateArray[1]);
+				
+				format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				String dateAlertString = String.valueOf(year)+"-"+String.valueOf(month)+"-"+String.valueOf(dayOfMonth)+" "+String.valueOf(hours)+":"+String.valueOf(minutes);
+				Date dateAlert = format.parse(dateAlertString);
+				
+				return new Alert(name, event, operator, dateAlert);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	private Event getEvent(String name){
+		for (Event event : events) {
+			if(event.getName().equals(name)){
+				return event;
+			}
 		}
 		return null;
 	}
@@ -176,18 +188,18 @@ public class InsertDataService {
 		List<Alert> alertsToRun = new ArrayList<Alert>();
 		
 		for (Alert alert : alerts) {
-			String alertEventName = alert.getEventName();
+			Event alertEvent = alert.getEvent();
 			String eventName = event.getName();
-			if(alertEventName.equals(eventName)) {
-				Date actualDate = new Date();
+			if(alertEvent.getName().equals(eventName)) {
+				Date eventDate = event.getDate();
 				Date alertDate = alert.getDate();
 				if(alert.getOperator().equals("max")) {
-					if(actualDate.after(alertDate)) {
+					if(eventDate.after(alertDate)) {
 						alertsToRun.add(alert);
 					}
 				}
 				else if(alert.getOperator().equals("min")){
-					if(actualDate.before(alertDate)) {
+					if(eventDate.before(alertDate)) {
 						alertsToRun.add(alert);
 					}
 				}
