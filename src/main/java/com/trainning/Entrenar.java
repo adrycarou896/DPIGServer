@@ -47,7 +47,7 @@ public class Entrenar implements Runnable{
 		String [] trainingDirs = new String[personsNames.length];
 		
 		for (int i = 0; i < trainingDirs.length; i++) {
-			trainingDirs[i] = Util.FOLDERS_USERS_PATH+"/"+personsNames[i];
+			trainingDirs[i] = Util.FOLDERS_INDIVIDUOS_PATH+"/"+personsNames[i];
 		}
 		
 		train(trainingDirs);
@@ -119,7 +119,7 @@ public class Entrenar implements Runnable{
 		 //Eigen -> <1000
 		 //System.out.println("CONF: "+confidences[0]);
 		 if(confidences[0]<700){
-			 System.out.println("RECONOCIDO: "+confidences[0] + " id: "+enteros[0]);
+			 //System.out.println("RECONOCIDO: "+confidences[0] + " id: "+enteros[0]);
 			 //System.out.println("MENOR: " + menor); 
 	    	 //System.out.println("MAYOR: " + mayor); 
 	    	 //System.out.println("Confidences--------------------->: "+confidences[0]);

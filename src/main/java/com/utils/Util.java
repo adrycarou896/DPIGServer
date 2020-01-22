@@ -8,7 +8,7 @@ public class Util {
 	public static final String CASCADE_PATH = "C:\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt2.xml";
 	
 	public static final String FOLDER_CAMERAS_PATH = "img/Cameras";
-	public static final String FOLDERS_USERS_PATH = "img/users";
+	public static final String FOLDERS_INDIVIDUOS_PATH = "img/individuos";
 	
 	public static final String RULES_FILE_PATH = "src/main/resources/rules.properties";
 	
@@ -16,7 +16,7 @@ public class Util {
 	public static final String SMARTTHINGS_DEVICES = "https://api.smartthings.com/v1/devices";
 	
 	public static final String[] getPersonsNames(){
-		File folderUsers = new File(FOLDERS_USERS_PATH);
+		File folderUsers = new File(FOLDERS_INDIVIDUOS_PATH);
         return folderUsers.list();
 	}
 }

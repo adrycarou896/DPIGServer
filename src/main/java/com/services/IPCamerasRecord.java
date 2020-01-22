@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
+import com.mysql.cj.conf.ConnectionUrlParser.Pair;
 import com.reader.ReadVideoFrames;
 import com.repository.IPCameraRepository;
 import com.smarthings.IPCamerasManager;
@@ -34,6 +35,9 @@ public class IPCamerasRecord implements Runnable{
 	
 	@Autowired
     private PatternsManager patternsManager;
+	
+	@Autowired
+	private ProcessIPCamera processIPCamera;
 	
 	private Map<String, String> deviceIdVideoURL;
 	
@@ -66,19 +70,24 @@ public class IPCamerasRecord implements Runnable{
 	    try {
 	    	List<IPCamera> devices = (List<IPCamera>) ipCameraRepository.findAll();
 	    	for (IPCamera device : devices) {
-				
-				List<BufferedImage> images = new ArrayList<BufferedImage>();
-				
-				String videoURL = ipCamerasManager.getVideoURL(device.getDeviceId());
+	    		
+	    		Pair<String, Date> videoURLAndCaptureTime = ipCamerasManager.getVideoURLAndCaptureTime(device.getDeviceId());
+	    		
+				String videoURL = videoURLAndCaptureTime.left;
+				Date captureTime = videoURLAndCaptureTime.right;
 				
 				if(videoURL!=null){
 					if(deviceWithImages!=null){
-						videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
+						videoURLAndCaptureTime = ipCamerasManager.getVideoURLAndCaptureTime(deviceWithImages.getDeviceId());
+						videoURL = videoURLAndCaptureTime.left;
+						captureTime = videoURLAndCaptureTime.right;
 					}
 				}
 				else{
 					deviceWithImages = device;
-					videoURL = ipCamerasManager.getVideoURL(deviceWithImages.getDeviceId());
+					videoURLAndCaptureTime = ipCamerasManager.getVideoURLAndCaptureTime(deviceWithImages.getDeviceId());
+					videoURL = videoURLAndCaptureTime.left;
+					captureTime = videoURLAndCaptureTime.right;
 				}
 				
 				//videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=3hvfRAnaIwlAakE00jclJ";
@@ -89,30 +98,9 @@ public class IPCamerasRecord implements Runnable{
 						anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
 					}
 					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ 
-						String videoFolderPath = Util.FOLDER_CAMERAS_PATH+"/"+device.getName()+"/Video/"+device.getName()+".mp4";
-						File videoFolder = new File(videoFolderPath);
-						videoFolder.mkdirs();
-						String videoFilePath = videoFolderPath + device.getName()+".mp4";
+						this.processIPCamera.setConfig(device, videoURL, captureTime, this.reconocimientoFacial);
+						this.processIPCamera.run();
 						
-						ipCamerasManager.saveFile(videoURL, videoFilePath);
-						
-						ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFilePath);
-						images = decodeAndCaptureFramesnew.getImages();
-						
-						Map<Long, Integer> imagenesIdentificadas = new HashMap<Long, Integer>();
-						for (BufferedImage image : images) {
-							Mat frame = bufferedImageToMat(image);
-							Mat frame_gray = new Mat();
-							long personIdEncontrada = this.reconocimientoFacial.reconocer(device, frame, frame_gray, numIter, device, imagenesIdentificadas);
-							if(personIdEncontrada!=-1 && imagenesIdentificadas.size()>=3){
-								long end = System.currentTimeMillis();
-								System.out.println("TIME: " + (end-start));
-								start = System.currentTimeMillis();
-								this.patternsManager.find(device, personIdEncontrada, new Date());
-								break;
-							}
-							
-						}
 						if(!this.deviceIdVideoURL.containsKey(device.getDeviceId())){
 							this.deviceIdVideoURL.put(device.getDeviceId(), videoURL);
 						}

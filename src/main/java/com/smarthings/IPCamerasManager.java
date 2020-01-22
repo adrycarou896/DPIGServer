@@ -6,13 +6,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.model.IPCamera;
+import com.mysql.cj.conf.ConnectionUrlParser.Pair;
 import com.utils.Util;
 
 import okhttp3.OkHttpClient;
@@ -102,7 +106,7 @@ public class IPCamerasManager {
 		return new JSONObject(responseBody);
 	}
 	
-	public String getVideoURL(String deviceId) throws IOException{
+	public Pair<String, Date> getVideoURLAndCaptureTime(String deviceId) throws IOException{
 		
 		JSONObject responseJSON = getSimpleRequest(Util.SMARTTHINGS_DEVICES+"/"+deviceId+"/status");
 		
@@ -115,7 +119,26 @@ public class IPCamerasManager {
 			JSONObject valueJSON = new JSONObject(value);
 			String status = valueJSON.get("status").toString();
 			if(status.equals("COMPLETE")){
-				return valueJSON.get("clipPath").toString();
+				
+				String videoURL = valueJSON.get("clipPath").toString();
+				
+				JSONObject imageCaptureJSON = new JSONObject(mainJSON.get("imageCapture").toString());
+				JSONObject captureTimeJSON = new JSONObject(imageCaptureJSON.get("captureTime").toString());
+				String captureTimeValue = captureTimeJSON.get("value").toString();
+				
+				//2020-01-21T17:33:41.000Z
+				String fechaCaptureTime = captureTimeValue.substring(0, 10);
+				String horaCaptureTime = captureTimeValue.substring(11, 19);
+				String captureTimeString = fechaCaptureTime+" "+horaCaptureTime;
+				
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+				Date captureTime;
+				try {
+					captureTime = format.parse(captureTimeString);
+					return new Pair<String, Date>(videoURL, captureTime);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}	
 			}
 		}
 		return null;

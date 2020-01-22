@@ -22,7 +22,7 @@ import com.trainning.Entrenar;
 import com.utils.Util;
 
 @Service
-public class ReconocimientoFacial {
+public class ReconocimientoFacial extends Thread{
 	 
     private CascadeClassifier Cascade;
     
@@ -31,6 +31,12 @@ public class ReconocimientoFacial {
     private Entrenar entrenamiento;
     
     private Map<String, List<Long>> devicePersons;
+    
+    private IPCamera device;
+    private Mat frame, frame_gray;
+    private int numIter;
+    
+    private long personIdEncontrada = -1;
     
     public void setConf(Entrenar entrenamiento){
     	this.Cascade = new CascadeClassifier(Util.CASCADE_PATH);
@@ -45,7 +51,16 @@ public class ReconocimientoFacial {
     	this.rostros = new MatOfRect();
     }
     
-    public long reconocer(IPCamera device, Mat frame, Mat frame_gray, int numIter, IPCamera ipCamera, Map<Long, Integer> imagenesIdentificadas) throws Exception{
+    public void setIdentifyValues(IPCamera device, Mat frame, Mat frame_gray, int numIter){
+    	this.device = device;
+    	this.frame = frame;
+    	this.frame_gray = frame_gray;
+    	this.numIter = numIter;
+    	this.personIdEncontrada = -1;
+    }
+    
+    @Override
+    public void run(){
 			
 			Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
 	        Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
@@ -79,17 +94,19 @@ public class ReconocimientoFacial {
 					boolean sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
 					//Cuando cambie de device se ejecuta el find
 	    			if(!sigueEnElMismoDevice){
-    						imagenesIdentificadas.replace(personId, imagenesIdentificadas.get(personId)+1);
-						
 							Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
-		    		    	System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
-		    		    	
-		    		    	return personId;
+		    		    	//System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
+							System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
+							
+		    		    	//return personId;
+							personIdEncontrada = personId;
 	    			}
 			    }
 	    	}
-     return -1;
+	        //return personIdEncontrada;
     }
+    
+    
     
     /**
      * 
@@ -144,6 +161,10 @@ public class ReconocimientoFacial {
     
     public Map<String, List<Long>>getDevicePersons(){
     	return this.devicePersons;
+    }
+    
+    public long getPersonIdEncontrada(){
+    	return this.personIdEncontrada;
     }
 	 
 }
