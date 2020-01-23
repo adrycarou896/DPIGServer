@@ -18,7 +18,7 @@ import com.model.rule.Rule;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.INTERFACES)
-public class EventsServer implements Runnable, IEventsServer {
+public class SocketServer implements Runnable, ISocketServer {
 	
 	private ServerSocket ss;
 	private List<Socket> connections = new ArrayList<Socket>();

@@ -9,6 +9,7 @@ import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -135,6 +136,12 @@ public class IPCamerasManager {
 				Date captureTime;
 				try {
 					captureTime = format.parse(captureTimeString);
+					
+					 Calendar calendar = Calendar.getInstance();
+					 calendar.setTime(captureTime);
+					 calendar.add(Calendar.HOUR, 1);
+					 captureTime = calendar.getTime();
+					 
 					return new Pair<String, Date>(videoURL, captureTime);
 				} catch (ParseException e) {
 					e.printStackTrace();

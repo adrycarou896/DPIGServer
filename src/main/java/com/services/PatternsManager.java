@@ -17,7 +17,7 @@ import com.model.rule.event.Event;
 import com.repository.IPCameraRepository;
 import com.repository.MatchRepository;
 import com.repository.PersonRepository;
-import com.socket.IEventsServer;
+import com.socket.ISocketServer;
 
 @Service
 public class PatternsManager {
@@ -35,7 +35,7 @@ public class PatternsManager {
 	private InsertDataService insertDataService;
 	
 	@Autowired
-	private IEventsServer eventServer;
+	private ISocketServer eventServer;
 	
 	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
 	

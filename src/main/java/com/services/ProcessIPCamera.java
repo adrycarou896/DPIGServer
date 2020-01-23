@@ -3,10 +3,13 @@ package com.services;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -19,12 +22,12 @@ import com.smarthings.IPCamerasManager;
 import com.utils.Util;
 
 @Service
-public class ProcessIPCamera extends Thread{
+public class ProcessIPCamera implements Runnable{
 	
 	private IPCamerasManager ipCamerasManager;
 	
 	@Autowired
-	private ReconocimientoFacial reconocimientoFacial;
+	private FacialRecognition facialRecognition;
 	
 	@Autowired
     private PatternsManager patternsManager;
@@ -33,11 +36,11 @@ public class ProcessIPCamera extends Thread{
 	private String videoURL;
 	private Date captureTime;
 	
-	public void setConfig(IPCamera device, String videoURL, Date captureTime, ReconocimientoFacial reconocimientoFacial){
+	public void setConfig(IPCamera device, String videoURL, Date captureTime, FacialRecognition facialRecognition){
 		this.device = device;
 		this.videoURL = videoURL;
 		this.captureTime = captureTime;
-		this.reconocimientoFacial = reconocimientoFacial;
+		this.facialRecognition = facialRecognition;
 		this.ipCamerasManager = new IPCamerasManager();
 	}
 	
@@ -56,13 +59,18 @@ public class ProcessIPCamera extends Thread{
 			ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFilePath);
 			List<BufferedImage> images = decodeAndCaptureFramesnew.getImages();
 			
+			ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
+			
 			Map<Long, Integer> imagenesIdentificadas = new HashMap<Long, Integer>();
+			int numImagen=0;
 			for (BufferedImage image : images) {
+				numImagen++;
 				Mat frame = bufferedImageToMat(image);
 				Mat frame_gray = new Mat();
-				this.reconocimientoFacial.setIdentifyValues(device, frame, frame_gray, 0);
-				this.reconocimientoFacial.run();
-				long personIdEncontrada = this.reconocimientoFacial.getPersonIdEncontrada();
+				this.facialRecognition.setIdentifyValues(device, frame, frame_gray, numImagen);
+				//executor.execute(this.reconocimientoFacial);
+				this.facialRecognition.run();
+				long personIdEncontrada = this.facialRecognition.getPersonIdEncontrada();
 				
 				if(!imagenesIdentificadas.containsKey(personIdEncontrada)){
 					imagenesIdentificadas.put(personIdEncontrada, 1);
@@ -72,7 +80,13 @@ public class ProcessIPCamera extends Thread{
 				}
 				
 				if(personIdEncontrada!=-1 /*&& imagenesIdentificadas.size()>=3*/){
-					this.patternsManager.find(device, personIdEncontrada, new Date());
+					int identifyScondOfTheVideo= (numImagen*10)/images.size();//Segundo en el que el usuario ha sido identificado dentro de los 10 segundos
+					int secondsToRest = 10 - identifyScondOfTheVideo;
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(captureTime);
+					calendar.add(Calendar.SECOND, -secondsToRest); 
+					captureTime=calendar.getTime();
+					this.patternsManager.find(device, personIdEncontrada, captureTime);
 					//System.out.println("individuo "+personIdEncontrada+" encontrado por "+device.getName());
 					break;
 				}

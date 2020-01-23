@@ -5,12 +5,12 @@ import java.io.FilenameFilter;
 
 import org.apache.commons.math3.util.Pair;
 
-import com.trainning.Entrenar;
+import com.trainning.Trainning;
 
 public class MainFaceRecognizer {
 	
 	public static void main(String[] args) {
-		Entrenar train = new Entrenar();
+		Trainning train = new Trainning();
 		train.run();
 		
 		//train.test("img/test/img46cara1.jpg");
@@ -29,7 +29,7 @@ public class MainFaceRecognizer {
         long suma = 0;
         for (File imageTest : fileTest.listFiles(imgFilter)) {
         	long inicio = System.currentTimeMillis();
-        	Pair<Integer, Double> person = train.test(imageTest.getAbsolutePath());
+        	Pair<Integer, Double> person = train.identify(imageTest.getAbsolutePath());
         	long end = System.currentTimeMillis();
         	if(person!=null){
         		long result = end-inicio;

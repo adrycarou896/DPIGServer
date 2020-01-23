@@ -18,27 +18,27 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
-import com.trainning.Entrenar;
+import com.trainning.Trainning;
 import com.utils.Util;
 
 @Service
-public class ReconocimientoFacial extends Thread{
+public class FacialRecognition implements Runnable{
 	 
     private CascadeClassifier Cascade;
     
     private MatOfRect rostros;
     
-    private Entrenar entrenamiento;
+    private Trainning entrenamiento;
     
     private Map<String, List<Long>> devicePersons;
     
     private IPCamera device;
     private Mat frame, frame_gray;
-    private int numIter;
+    private int iter;
     
     private long personIdEncontrada = -1;
     
-    public void setConf(Entrenar entrenamiento){
+    public void setConf(Trainning entrenamiento){
     	this.Cascade = new CascadeClassifier(Util.CASCADE_PATH);
     	this.rostros = new MatOfRect();
     	this.entrenamiento = entrenamiento;
@@ -51,12 +51,12 @@ public class ReconocimientoFacial extends Thread{
     	this.rostros = new MatOfRect();
     }
     
-    public void setIdentifyValues(IPCamera device, Mat frame, Mat frame_gray, int numIter){
+    public void setIdentifyValues(IPCamera device, Mat frame, Mat frame_gray, int iter){
     	this.device = device;
     	this.frame = frame;
     	this.frame_gray = frame_gray;
-    	this.numIter = numIter;
     	this.personIdEncontrada = -1;
+    	this.iter = iter;
     }
     
     @Override
@@ -73,7 +73,7 @@ public class ReconocimientoFacial extends Thread{
 	        Rect rectCrop = new Rect();
 	
 	        for (Rect rostro : rostrosLista) {
-	    		String rutaImagen = "img/imagenAdecuada.jpg";
+	    		String rutaImagen = "img/imagenAdecuada"+device.getName()+"_"+iter+".jpg";
 	    	    
 	    		//Se recorta la imagen
 	    		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
@@ -86,7 +86,7 @@ public class ReconocimientoFacial extends Thread{
 				//Se guarda la imagen
 	    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
 					
-	    		Pair<Integer, Double> personPair = this.entrenamiento.test(rutaImagen);
+	    		Pair<Integer, Double> personPair = this.entrenamiento.identify(rutaImagen);
 	    		
 	    		if(personPair!=null){
 	    			long personId = (long) personPair.getFirst();//La id es la label
@@ -95,15 +95,11 @@ public class ReconocimientoFacial extends Thread{
 					//Cuando cambie de device se ejecuta el find
 	    			if(!sigueEnElMismoDevice){
 							Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
-		    		    	//System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName()+", num_iter: "+numIter);
 							System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
-							
-		    		    	//return personId;
 							personIdEncontrada = personId;
 	    			}
 			    }
 	    	}
-	        //return personIdEncontrada;
     }
     
     

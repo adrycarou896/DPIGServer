@@ -14,29 +14,24 @@ import org.apache.commons.math3.util.Pair;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_face.EigenFaceRecognizer;
-import org.bytedeco.javacpp.opencv_face.FisherFaceRecognizer;
-import org.bytedeco.javacpp.opencv_face.LBPHFaceRecognizer;
-import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import com.utils.Util;
 
-public class Entrenar implements Runnable{
+public class Trainning implements Runnable{
 	
 	private EigenFaceRecognizer eigenFaceRecognizer;
 	
-	private double mayor = 0.0;
-	
+	/*private double mayor = 0.0;
 	private double menor = Double.POSITIVE_INFINITY;
-	
 	private OpenCVFrameConverter.ToOrgOpenCvCoreMat conversorMatOpenCVCore;
-	private OpenCVFrameConverter.ToMat conversorMat;
+	private OpenCVFrameConverter.ToMat conversorMat;*/
 	
-	public Entrenar() {
+	public Trainning() {
 		//this.faceRecognizer = EigenFaceRecognizer.create();
 		this.eigenFaceRecognizer = EigenFaceRecognizer.create();
 		//this.faceRecognizer = FisherFaceRecognizer.create(NUMERO_DE_USUARIOS, DBL_MAX);
-		this.conversorMatOpenCVCore = new OpenCVFrameConverter.ToOrgOpenCvCoreMat();
-		this.conversorMat = new OpenCVFrameConverter.ToMat();
+		//this.conversorMatOpenCVCore = new OpenCVFrameConverter.ToOrgOpenCvCoreMat();
+		//this.conversorMat = new OpenCVFrameConverter.ToMat();
 	}
 	
 	@Override
@@ -98,9 +93,9 @@ public class Entrenar implements Runnable{
         
     } 
 	
-	public Pair<Integer, Double> test(String testImage){
+	public Pair<Integer, Double> identify(String imagePath){
 		
-		 Mat testImageMat = imread(testImage, IMREAD_GRAYSCALE); 
+		 Mat testImageMat = imread(imagePath, IMREAD_GRAYSCALE); 
 		 //Frame frame = conversorMatOpenCVCore.convert(image);
 		 //Mat testImageMat = conversorMat.convert(frame);
 		
@@ -112,9 +107,9 @@ public class Entrenar implements Runnable{
 			 mayor=confidences[0];
 		 }*/
 		 
-		 if(confidences[0]<menor){
+		 /*if(confidences[0]<menor){
 			 menor = confidences[0];
-		 }
+		 }*/
 		 //LBPH -> <100
 		 //Eigen -> <1000
 		 //System.out.println("CONF: "+confidences[0]);

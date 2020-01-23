@@ -23,7 +23,7 @@ import org.opencv.objdetect.CascadeClassifier;
 
 import com.model.IPCamera;
 import com.model.ImageFalsePositive;
-import com.trainning.Entrenar;
+import com.trainning.Trainning;
 
 public class ReconocimientoFacialPrueba {
 	 
@@ -38,7 +38,7 @@ public class ReconocimientoFacialPrueba {
     }
 
     
-    public void reconocerRostroYGuardar(int numImagen, Mat frame, Mat frame_gray, Entrenar entrenar) throws Exception{
+    public void reconocerRostroYGuardar(int numImagen, Mat frame, Mat frame_gray, Trainning entrenar) throws Exception{
     	Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
         Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
         double w = frame.width();

@@ -17,7 +17,7 @@ import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import com.smarthings.IPCamerasManager;
-import com.trainning.Entrenar;
+import com.trainning.Trainning;
 
 public class IPCameraRecordPrueba implements Runnable{
 	
@@ -33,7 +33,7 @@ public class IPCameraRecordPrueba implements Runnable{
 	
 	@Override
 	public void run() {
-		Entrenar entrenar = new Entrenar();
+		Trainning entrenar = new Trainning();
 		entrenar.run();
 		
 		List<String> videosURL = new ArrayList<String>();

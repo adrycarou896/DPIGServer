@@ -2,12 +2,12 @@ package com.services;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -16,11 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.model.IPCamera;
 import com.mysql.cj.conf.ConnectionUrlParser.Pair;
-import com.reader.ReadVideoFrames;
 import com.repository.IPCameraRepository;
 import com.smarthings.IPCamerasManager;
-import com.trainning.Entrenar;
-import com.utils.Util;
+import com.trainning.Trainning;
 
 @Service
 public class IPCamerasRecord implements Runnable{
@@ -31,10 +29,7 @@ public class IPCamerasRecord implements Runnable{
 	private IPCameraRepository ipCameraRepository;
 	
 	@Autowired
-	private ReconocimientoFacial reconocimientoFacial;
-	
-	@Autowired
-    private PatternsManager patternsManager;
+	private FacialRecognition reconocimientoFacial;
 	
 	@Autowired
 	private ProcessIPCamera processIPCamera;
@@ -43,34 +38,23 @@ public class IPCamerasRecord implements Runnable{
 	
 	private IPCamera deviceWithImages;
 	
-	private int numIter = 0;
-	
-	private long start;
-	
-	public void setConf(IPCamerasManager ipCamerasManager, Entrenar entrenamiento){
+	public void setConf(IPCamerasManager ipCamerasManager, Trainning entrenamiento){
 		this.reconocimientoFacial.setConf(entrenamiento);
 		this.ipCamerasManager = ipCamerasManager;
 		this.deviceIdVideoURL = new HashMap<String, String>();
+		
 	}
 	
 	public Map<String, List<Long>> getDevicePersons(){
 		return this.reconocimientoFacial.getDevicePersons();
 	}
 	
-	public void setNumIter(int numIter){
-		this.numIter=numIter;
-	}
-	
-	public void setStart(long start){
-		this.start = start;
-	}
-	
 	@Override
 	public void run() {
 	    try {
+	    	ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
 	    	List<IPCamera> devices = (List<IPCamera>) ipCameraRepository.findAll();
 	    	for (IPCamera device : devices) {
-	    		
 	    		Pair<String, Date> videoURLAndCaptureTime = ipCamerasManager.getVideoURLAndCaptureTime(device.getDeviceId());
 	    		
 				String videoURL = videoURLAndCaptureTime.left;
@@ -90,7 +74,6 @@ public class IPCamerasRecord implements Runnable{
 					captureTime = videoURLAndCaptureTime.right;
 				}
 				
-				//videoURL="https://mediaserv.euw1.st-av.net/clip?source_id=2abf098f-694c-4be2-87f1-249ac5050712&clip_id=3hvfRAnaIwlAakE00jclJ";
 				if(videoURL!=null){
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = null;
@@ -99,6 +82,7 @@ public class IPCamerasRecord implements Runnable{
 					}
 					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ 
 						this.processIPCamera.setConfig(device, videoURL, captureTime, this.reconocimientoFacial);
+						//executor.execute(this.processIPCamera);
 						this.processIPCamera.run();
 						
 						if(!this.deviceIdVideoURL.containsKey(device.getDeviceId())){
@@ -109,13 +93,13 @@ public class IPCamerasRecord implements Runnable{
 						}
 						
 					}
-					else{
+					/*else{
 						System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no se ha procesado por no detectar cambios");
-					} 	
+					} */	
 	    		}
-				else{
+				/*else{
 					System.out.println("La cámara "+device.getName()+" e id "+device.getDeviceId()+" no tiene videos disponibles");
-				}
+				}*/
 			}
 			
 		} catch (Exception e) {
