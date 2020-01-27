@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -74,6 +76,7 @@ public class IPCamerasRecord implements Runnable{
 					captureTime = videoURLAndCaptureTime.right;
 				}
 				
+				ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
 				if(videoURL!=null){
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = null;
@@ -81,8 +84,9 @@ public class IPCamerasRecord implements Runnable{
 						anteriorVideoURL = this.deviceIdVideoURL.get(device.getDeviceId());
 					}
 					if(anteriorVideoURL==null || !anteriorVideoURL.equals(videoURL)){ 
-						this.processIPCamera.setConfig(device, videoURL, captureTime, this.reconocimientoFacial, this.ipCamerasManager);
+						this.processIPCamera.setConfig(device, videoURL, captureTime, this.ipCamerasManager);
 						//executor.execute(this.processIPCamera);
+						//this.processIPCamera.start();
 						this.processIPCamera.run();
 						
 						if(!this.deviceIdVideoURL.containsKey(device.getDeviceId())){

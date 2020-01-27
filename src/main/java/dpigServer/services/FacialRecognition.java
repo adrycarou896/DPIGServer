@@ -22,7 +22,7 @@ import dpigServer.training.Training;
 import dpigServer.utils.Util;
 
 @Service
-public class FacialRecognition implements Runnable{
+public class FacialRecognition extends Thread{
 	 
     private CascadeClassifier Cascade;
     
@@ -36,6 +36,8 @@ public class FacialRecognition implements Runnable{
     private Mat frame, frame_gray;
     private int iter;
     private List<Long> personIdsEncontrados;
+    
+    private List<Long> personIdsEncontradosEnEstaIteraccion;
     
     //private long personIdEncontrada = -1;
     
@@ -52,59 +54,66 @@ public class FacialRecognition implements Runnable{
     	this.rostros = new MatOfRect();
     }
     
-    public void setIdentifyValues(IPCamera device, Mat frame, Mat frame_gray, int iter){
+    public void setIdentifyValues(IPCamera device, Mat frame, Mat frame_gray, int iter, List<Long> personIdsEncontrados){
     	this.device = device;
     	this.frame = frame;
     	this.frame_gray = frame_gray;
     	//this.personIdEncontrada = -1;
     	this.iter = iter;
-    	this.personIdsEncontrados = new ArrayList<Long>();
+    	this.personIdsEncontrados = personIdsEncontrados;
+    	this.personIdsEncontradosEnEstaIteraccion = new ArrayList<Long>();
     }
     
     @Override
-    public void run(){
-			Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
-	        Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
-	        double w = frame.width();
-	        double h = frame.height();
-	        
-	        Cascade.detectMultiScale(frame_gray, rostros, 1.1, 2, 0|CASCADE_SCALE_IMAGE, new Size(30, 30), new Size(w, h));
-	        Rect[] rostrosLista = rostros.toArray();
-	        
-	        Rect rectCrop = new Rect();
-	
-	        for (Rect rostro : rostrosLista) {
-	    		String rutaImagen = "img/imagenAdecuada"+device.getName()+"_"+iter+".jpg";
-	    	    
-	    		//Se recorta la imagen
-	    		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
-	    		Mat frameRecortado = new Mat(frame,rectCrop);
-	    		
-	    		//Se pone en un tamaño adecuado
-				Mat frameAdecuado = new Mat();
-				Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
-				
-				//Se guarda la imagen
-	    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
-					
-	    		Pair<Integer, Double> personPair = this.entrenamiento.identify(rutaImagen);
-	    		
-	    		if(personPair!=null){
-	    			long personId = (long) personPair.getFirst();//La id es la label
-	    			
-					boolean sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
-					//Cuando cambie de device se ejecuta el find
-	    			if(!sigueEnElMismoDevice){
-							Imgcodecs.imwrite("img/paso.jpg", frameAdecuado);
-							System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
-							if(!this.personIdsEncontrados.contains(personId)){
-								this.personIdsEncontrados.add(personId);
-							}
-	    			}
-			    }
-	    	}
-    }
-    
+    public synchronized void start(){
+    	Imgproc.cvtColor(frame, frame_gray, Imgproc.COLOR_BGR2GRAY);//Colvierte la imagene a color a blanco y negro
+        Imgproc.equalizeHist(frame_gray, frame_gray);//Valanzeamos los tonos grises
+        double w = frame.width();
+        double h = frame.height();
+        
+        Cascade.detectMultiScale(frame_gray, rostros, 1.1, 2, 0|CASCADE_SCALE_IMAGE, new Size(30, 30), new Size(w, h));
+        Rect[] rostrosLista = rostros.toArray();
+        
+        Rect rectCrop = new Rect();
+        
+        Pair<Integer, Double> personPair = null;
+        String rutaImagen = null;
+        Mat frameRecortado = null;
+        Mat frameAdecuado = null;
+        long personId = -1;
+        
+        for (Rect rostro : rostrosLista) {
+    		rutaImagen = "img/imagenesEnEjecucion/img_"+device.getName()+"_"+iter+".jpg";
+    	    
+    		//Se recorta la imagen
+    		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
+    		frameRecortado = new Mat(frame,rectCrop);
+    		
+    		//Se pone en un tamaño adecuado
+			frameAdecuado = new Mat();
+			Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
+			
+			//Se guarda la imagen
+    		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
+			
+    		//System.out.println("Ruta->"+rutaImagen+", tam->"+frameAdecuado.height()+","+frameAdecuado.width());
+    		personPair = this.entrenamiento.identify(rutaImagen);
+    		
+    		if(personPair!=null){
+    			personId = (long) personPair.getFirst();//La id es la label
+    				//sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
+    				//Cuando cambie de device se ejecuta el find
+        			//if(!sigueEnElMismoDevice){
+					System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
+					if(!personIdsEncontrados.contains(personId)){
+						personIdsEncontrados.add(personId);
+						personIdsEncontradosEnEstaIteraccion.add(personId);
+					}
+    						
+        			//}
+    			}
+		    }
+    	}
     
     
     /**
@@ -168,6 +177,12 @@ public class FacialRecognition implements Runnable{
     public List<Long> getPersonIdsEncontrados(){
     	return this.personIdsEncontrados;
     }
+
+	public List<Long> getPersonIdsEncontradosEnEstaIteraccion() {
+		return personIdsEncontradosEnEstaIteraccion;
+	}
+    
+    
 	 
 }
 

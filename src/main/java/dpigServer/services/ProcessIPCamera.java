@@ -3,9 +3,12 @@ package dpigServer.services;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -33,16 +36,15 @@ public class ProcessIPCamera implements Runnable{
 	private String videoURL;
 	private Date captureTime;
 	
-	public void setConfig(IPCamera device, String videoURL, Date captureTime, FacialRecognition facialRecognition, IPCameraManager ipCamerasManager){
+	public void setConfig(IPCamera device, String videoURL, Date captureTime, IPCameraManager ipCamerasManager){
 		this.device = device;
 		this.videoURL = videoURL;
 		this.captureTime = captureTime;
-		this.facialRecognition = facialRecognition;
 		this.ipCamerasManager = ipCamerasManager;
 	}
 	
-	@Override
-	public void run(){
+	 @Override
+	 public void run(){
 		try{
 			String videoFolderPath = Util.FOLDER_CAMERAS_PATH+"/"+device.getName()+"/Video/";
 			File videoFolder = new File(videoFolderPath);
@@ -60,21 +62,25 @@ public class ProcessIPCamera implements Runnable{
 			
 			//Map<Long, Integer> imagenesIdentificadas = new HashMap<Long, Integer>();
 			int numImagen=0;
+			List<Long> personIdsEncontrados = new ArrayList<Long>();
 			for (BufferedImage image : images) {
 				numImagen++;
 				Mat frame = bufferedImageToMat(image);
 				Mat frame_gray = new Mat();
-				this.facialRecognition.setIdentifyValues(device, frame, frame_gray, numImagen);
-				//executor.execute(this.reconocimientoFacial);
-				this.facialRecognition.run();
-				List<Long> personIdsEncontrados = this.facialRecognition.getPersonIdsEncontrados();
+				this.facialRecognition.setIdentifyValues(device, frame, frame_gray, numImagen, personIdsEncontrados);
+				//executor.execute(this.facialRecognition);
+				this.facialRecognition.start();
+				//this.facialRecognition.run();
+				List<Long> personIdsEncontradosEnEstaIteraccion = this.facialRecognition.getPersonIdsEncontradosEnEstaIteraccion();
 				
-				for (Long personIdEncontrada : personIdsEncontrados) {
+				boolean hayPersonas = false;
+				for (Long personIdEncontradoEnEstaIteraccion : personIdsEncontradosEnEstaIteraccion) {
 					
 					captureTime=getCaptureTime(numImagen, images.size());
-					Match match = this.patternsManager.saveMatch(device, personIdEncontrada, captureTime);
+					Match match = this.patternsManager.saveMatch(device, personIdEncontradoEnEstaIteraccion, captureTime);
 					this.patternsManager.findPattern(match.getPerson());
 					
+					hayPersonas=true;
 					/*if(!imagenesIdentificadas.containsKey(personIdEncontrada)){
 						imagenesIdentificadas.put(personIdEncontrada, 1);
 					}
@@ -86,7 +92,9 @@ public class ProcessIPCamera implements Runnable{
 						//System.out.println("individuo "+personIdEncontrada+" encontrado por "+device.getName());
 					//}
 				}
-
+				if(hayPersonas){
+					break;
+				}
 				
 			}
 		}catch(Exception e){

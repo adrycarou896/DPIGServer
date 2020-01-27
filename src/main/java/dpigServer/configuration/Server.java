@@ -32,7 +32,6 @@ public class Server{
 		return new CommandLineRunner() {
 			@Override
 			public void run(String... args) throws Exception {
-				//System.out.println("eoooooooooooooo -> "+args[0]);
 				executor.execute(server);
 			}
 		};
@@ -43,7 +42,6 @@ public class Server{
 	public CommandLineRunner schedulingRunner(TaskExecutor executor) {
 	    return new CommandLineRunner() {
 	        public void run(String... args) throws Exception {
-	        	//System.out.println("sfvsfvasfv -> "+args[0]);
 	            executor.execute(new Runnable() {
 					@Override
 					public void run() {
@@ -54,7 +52,10 @@ public class Server{
 						
 						ipCamerasRecord.setConf(train, insertDataService.getUtil());
 						while (true) {
+							long inicio = System.currentTimeMillis();
 							ipCamerasRecord.run();
+							long fin = System.currentTimeMillis();
+							System.out.println("Tiempo->"+((fin-inicio)/1000));
 							try {
 								Thread.sleep(1000);
 							} catch (InterruptedException e) {
