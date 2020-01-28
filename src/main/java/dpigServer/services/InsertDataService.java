@@ -1,10 +1,13 @@
 package dpigServer.services;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +43,8 @@ public class InsertDataService implements CommandLineRunner{
 	private List<Alert> alerts = new ArrayList<Alert>();
 	
 	private Util util;
+	
+	private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
 		  
 	@Override
 	public void run(String... args) throws Exception {
@@ -69,7 +74,7 @@ public class InsertDataService implements CommandLineRunner{
 				personRepository.save(person);
 			}
 			
-			//saveFalsesPositivesImages();
+			saveFalsesPositivesImages(devices.size());
 			
 			data = properties.readPropertiesFile();
 			//GENERAR EVENTOS Y ALERTAS (REGLAS)
@@ -211,6 +216,29 @@ public class InsertDataService implements CommandLineRunner{
 			}
 		}
 		return alertsToRun;
+	}
+	
+	private void saveFalsesPositivesImages(int numCameras){
+		//Recoger todas las imágenes de la carpeta donde las guardo
+		FilenameFilter imgFilter = new FilenameFilter() { 
+			public boolean accept(File dir, String name) { 
+                name = name.toLowerCase(); 
+                return name.endsWith(".jpg") || name.endsWith(".pgm") || name.endsWith(".png"); 
+            } 
+        }; 
+        
+        for (int i = 1; i <= numCameras; i++) {
+        	long ipCameraId = i;
+        	IPCamera ipCamera = ipCameraRepository.findByIPCameraId(ipCameraId);
+        	String ipCameraName = ipCamera.getName();
+        	String fileDir = "img/Cameras/"+ipCameraName+"/falsesPositivesImages/";
+        	File root = new File(fileDir); 
+        	this.imagesFalsePostive.put(ipCamera.getDeviceId(), root.listFiles(imgFilter));
+		}	
+	}
+	
+	public Map<String, File[]> getImagesFalsePostive() {
+		return imagesFalsePostive;
 	}
 	
 	public List<Event> getEvents(){

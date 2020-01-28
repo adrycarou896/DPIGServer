@@ -2,10 +2,15 @@ package dpigServer.services;
 
 import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.math3.util.Pair;
 import org.opencv.core.Mat;
@@ -15,6 +20,7 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dpigServer.model.IPCamera;
@@ -24,6 +30,9 @@ import dpigServer.utils.Util;
 @Service
 public class FacialRecognition extends Thread{
 	 
+	@Autowired
+	private InsertDataService insertDataService;
+	
     private CascadeClassifier Cascade;
     
     private MatOfRect rostros;
@@ -96,25 +105,62 @@ public class FacialRecognition extends Thread{
 			//Se guarda la imagen
     		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
 			
-    		//System.out.println("Ruta->"+rutaImagen+", tam->"+frameAdecuado.height()+","+frameAdecuado.width());
-    		personPair = this.entrenamiento.identify(rutaImagen);
-    		
-    		if(personPair!=null){
-    			personId = (long) personPair.getFirst();//La id es la label
-    				//sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
-    				//Cuando cambie de device se ejecuta el find
-        			//if(!sigueEnElMismoDevice){
-					System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
-					if(!personIdsEncontrados.contains(personId)){
-						personIdsEncontrados.add(personId);
-						personIdsEncontradosEnEstaIteraccion.add(personId);
-					}
-    						
-        			//}
-    			}
-		    }
-    	}
+    			//System.out.println("Ruta->"+rutaImagen+", tam->"+frameAdecuado.height()+","+frameAdecuado.width());
+        		personPair = this.entrenamiento.identify(rutaImagen);
+        		
+        		if(personPair!=null){
+        			personId = (long) personPair.getFirst();//La id es la label
+        				//sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
+        				//Cuando cambie de device se ejecuta el find
+            			//if(!sigueEnElMismoDevice){
+    					System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
+    					if(!personIdsEncontrados.contains(personId)){
+    						personIdsEncontrados.add(personId);
+    						personIdsEncontradosEnEstaIteraccion.add(personId);
+    					}
+        	}
+        }
+    }
     
+	public boolean isImageFalsePositive(IPCamera ipCamera, File newImage){
+		File[] imagesFalsePositive = insertDataService.getImagesFalsePostive().get(ipCamera.getDeviceId());
+    	for (File imageFalsePositive : imagesFalsePositive) {
+			if(compareImage(imageFalsePositive, newImage)){
+				return true;
+			}
+		}
+    	return false;
+    }
+	
+	private boolean compareImage(File fileA, File fileB) {        
+	    try {
+	        //take buffer data from botm image files //
+	        BufferedImage biA = ImageIO.read(fileA);
+	        DataBuffer dbA = biA.getData().getDataBuffer();
+	        int sizeA = dbA.getSize();                      
+	        BufferedImage biB = ImageIO.read(fileB);
+	        DataBuffer dbB = biB.getData().getDataBuffer();
+	        int sizeB = dbB.getSize();
+	        //compare data-buffer objects //
+	        if(sizeA == sizeB) {
+	            for(int i=0; i<sizeA; i++) { 
+	                if(dbA.getElem(i) != dbB.getElem(i)) {
+	                    return false;
+	                }
+	            }
+	            return true;
+	        }
+	        else {
+	            return false;
+	        }
+	    } 
+	    catch (Exception e) { 
+	        System.out.println("Failed to compare image files ...");
+	        return  false;
+	    }
+	}
+	
+	
     
     /**
      * 

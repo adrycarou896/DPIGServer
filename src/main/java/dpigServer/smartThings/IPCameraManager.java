@@ -68,10 +68,11 @@ public class IPCameraManager {
 			
 			String deviceId = deviceJSON.get("deviceId").toString();
 			String name = deviceJSON.get("name").toString();
-			IPCamera ipCamera = new IPCamera(deviceId, name);
-			
-			cameras.add(ipCamera);
-			
+			String type = deviceJSON.get("type").toString();
+			if(type.equals("DTH")){
+				IPCamera ipCamera = new IPCamera(deviceId, name);
+				cameras.add(ipCamera);
+			}
 		}
 		return cameras;
 	}
