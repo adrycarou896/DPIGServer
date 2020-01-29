@@ -45,6 +45,7 @@ public class InsertDataService implements CommandLineRunner{
 		  
 	@Override
 	public void run(String... args) throws Exception {
+		if (args.length != 4) return;
 		String trinningFolderPath=args[0];
 		String rulesFilePath=args[1];
 		String smartThingsToken=args[2];

@@ -4,6 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import dpigServer.utils.InputCheck;
+
 @SpringBootApplication
 @EnableAutoConfiguration
 public class DPIGServerApplication {
@@ -14,6 +16,8 @@ public class DPIGServerApplication {
 		args[1]="src/main/resources/rules.properties";
 		args[2]="82c908bc-daec-4b43-b643-08b90273923e";
 		args[3]="4999";
-		SpringApplication.run(DPIGServerApplication.class, args);
+		if (InputCheck.validParams(args)) SpringApplication.run(DPIGServerApplication.class, args);
 	}
+	
+	
 }
