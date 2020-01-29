@@ -42,7 +42,7 @@ public class IPCamerasRecord implements Runnable{
 	
 	public void setConf(Training entrenamiento, Util util){
 		this.reconocimientoFacial.setConf(entrenamiento);
-		this.ipCamerasManager = new IPCameraManager(util);
+		this.ipCamerasManager = new IPCameraManager(util.getSmartThingsToken());
 		this.deviceIdVideoURL = new HashMap<String, String>();
 		
 	}

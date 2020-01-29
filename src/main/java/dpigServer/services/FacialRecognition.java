@@ -3,16 +3,14 @@ package dpigServer.services;
 import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.io.File;
+import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
 import org.apache.commons.math3.util.Pair;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
@@ -20,7 +18,6 @@ import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dpigServer.model.IPCamera;
@@ -29,9 +26,6 @@ import dpigServer.utils.Util;
 
 @Service
 public class FacialRecognition extends Thread{
-	 
-	@Autowired
-	private InsertDataService insertDataService;
 	
     private CascadeClassifier Cascade;
     
@@ -63,10 +57,10 @@ public class FacialRecognition extends Thread{
     	this.rostros = new MatOfRect();
     }
     
-    public void setIdentifyValues(IPCamera device, Mat frame, Mat frame_gray, int iter, List<Long> personIdsEncontrados){
+    public void setIdentifyValues(BufferedImage image, IPCamera device, int iter, List<Long> personIdsEncontrados){
     	this.device = device;
-    	this.frame = frame;
-    	this.frame_gray = frame_gray;
+		frame = bufferedImageToMat(image);
+		frame_gray = new Mat();
     	//this.personIdEncontrada = -1;
     	this.iter = iter;
     	this.personIdsEncontrados = personIdsEncontrados;
@@ -122,15 +116,38 @@ public class FacialRecognition extends Thread{
         }
     }
     
-	public boolean isImageFalsePositive(IPCamera ipCamera, File newImage){
+    public Map<String, List<Long>>getDevicePersons(){
+    	return this.devicePersons;
+    }
+    
+    public List<Long> getPersonIdsEncontrados(){
+    	return this.personIdsEncontrados;
+    }
+
+	public List<Long> getPersonIdsEncontradosEnEstaIteraccion() {
+		return personIdsEncontradosEnEstaIteraccion;
+	}
+	
+	public static Mat bufferedImageToMat(BufferedImage bi) {
+		  Mat mat = new Mat(bi.getHeight(), bi.getWidth(), CvType.CV_8UC3);
+		  byte[] data = ((DataBufferByte) bi.getRaster().getDataBuffer()).getData();
+		  mat.put(0, 0, data);
+		  return mat;
+	}
+	
+	    /*public long getPersonIdEncontrada(){
+			return this.personIdEncontrada;
+		}*/
+    
+		/*public boolean isImageFalsePositive(IPCamera ipCamera, File newImage){
 		File[] imagesFalsePositive = insertDataService.getImagesFalsePostive().get(ipCamera.getDeviceId());
-    	for (File imageFalsePositive : imagesFalsePositive) {
+		for (File imageFalsePositive : imagesFalsePositive) {
 			if(compareImage(imageFalsePositive, newImage)){
 				return true;
 			}
 		}
-    	return false;
-    }
+		return false;
+	}
 	
 	private boolean compareImage(File fileA, File fileB) {        
 	    try {
@@ -158,77 +175,61 @@ public class FacialRecognition extends Thread{
 	        System.out.println("Failed to compare image files ...");
 	        return  false;
 	    }
-	}
+	}*/
 	
 	
-    
-    /**
-     * 
-     * @param device
-     * @param person
-     * @return
-     * 
-     * Asegura que la persona solo se enucentra en la lista de personas reconocidas por una cámara (la última que le vió)
-     */
-    private boolean sigueEnElMismoDevice(String device, Long person)
-    {
-    	boolean sigueEnElMismoDevice = cleanPersonOfDevicesList(device, person);
-    	if(!sigueEnElMismoDevice){
-    		if(!devicePersons.containsKey(device)){
-        		List<Long> persons = new ArrayList<>();
-    			persons.add(person);
-    			devicePersons.put(device, persons);
-        	}
-        	else{
-        		List<Long> persons = devicePersons.get(device);
-        		persons.add(person);
-        	}
-    		return false;
-    	}
-    	return true;
-    	
-    }
-    
-    /**
-     * 
-     * @param device
-     * @param person
-     * @return
-     * 
-     * Asegura que solo el último dispositivo que reconoció a una persona x tenga a esa persona x.
-     */
-    private boolean cleanPersonOfDevicesList(String device, Long person){
-    	for (Map.Entry<String, List<Long>> entry : devicePersons.entrySet()) {
-    		String keyDevice = entry.getKey();
-    		List<Long> personsList = entry.getValue();
-    		if(personsList.contains(person)){
-    			if(!keyDevice.equals(device)){
-    				personsList.remove(person);
-    			}
-    			else{
-    				return true;
-    			}
-    		}
-    	}
-    	return false;
-    }
-    
-    public Map<String, List<Long>>getDevicePersons(){
-    	return this.devicePersons;
-    }
-    
-    /*public long getPersonIdEncontrada(){
-    	return this.personIdEncontrada;
-    }*/
-    public List<Long> getPersonIdsEncontrados(){
-    	return this.personIdsEncontrados;
-    }
-
-	public List<Long> getPersonIdsEncontradosEnEstaIteraccion() {
-		return personIdsEncontradosEnEstaIteraccion;
-	}
-    
-    
+	
+	/**
+	 * 
+	 * @param device
+	 * @param person
+	 * @return
+	 * 
+	 * Asegura que la persona solo se enucentra en la lista de personas reconocidas por una cámara (la última que le vió)
+	 */
+	/* private boolean sigueEnElMismoDevice(String device, Long person)
+	{
+		boolean sigueEnElMismoDevice = cleanPersonOfDevicesList(device, person);
+		if(!sigueEnElMismoDevice){
+			if(!devicePersons.containsKey(device)){
+	    		List<Long> persons = new ArrayList<>();
+				persons.add(person);
+				devicePersons.put(device, persons);
+	    	}
+	    	else{
+	    		List<Long> persons = devicePersons.get(device);
+	    		persons.add(person);
+	    	}
+			return false;
+		}
+		return true;
+		
+	}*/
+	
+	/**
+	 * 
+	 * @param device
+	 * @param person
+	 * @return
+	 * 
+	 * Asegura que solo el último dispositivo que reconoció a una persona x tenga a esa persona x.
+	 */
+	/*private boolean cleanPersonOfDevicesList(String device, Long person){
+		for (Map.Entry<String, List<Long>> entry : devicePersons.entrySet()) {
+			String keyDevice = entry.getKey();
+			List<Long> personsList = entry.getValue();
+			if(personsList.contains(person)){
+				if(!keyDevice.equals(device)){
+					personsList.remove(person);
+				}
+				else{
+					return true;
+				}
+			}
+		}
+		return false;
+	}*/
+	    
 	 
 }
 

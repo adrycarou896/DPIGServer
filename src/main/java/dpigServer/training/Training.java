@@ -39,11 +39,11 @@ public class Training implements Runnable{
 	@Override
 	public void run() {
         
-        String[] personsNames = util.getPersonasNames();
+        String[] personsNames = util.getPersonsNames();
         
 		String [] trainingDirs = new String[personsNames.length];
 		
-		for (int i = 0; i < trainingDirs.length; i++) {
+		for (int i = 0; i < personsNames.length; i++) {
 			trainingDirs[i] = util.getTrainingFolderPath()+"/"+personsNames[i];
 		}
 		

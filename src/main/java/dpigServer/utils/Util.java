@@ -82,7 +82,7 @@ public class Util {
 
 
 
-	public String[] getPersonasNames(){
+	public String[] getPersonsNames(){
 		File folderUsers = new File(trainingFolderPath);
 	    return folderUsers.list();
 	}

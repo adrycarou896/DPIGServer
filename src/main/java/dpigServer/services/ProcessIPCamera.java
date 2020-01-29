@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -52,7 +50,6 @@ public class ProcessIPCamera implements Runnable{
 				videoFolder.mkdirs();
 			}
 			String videoFilePath = videoFolderPath + device.getName()+".mp4";
-			
 			ipCamerasManager.saveFile(videoURL, videoFilePath);
 			
 			ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFilePath);
@@ -65,9 +62,7 @@ public class ProcessIPCamera implements Runnable{
 			List<Long> personIdsEncontrados = new ArrayList<Long>();
 			for (BufferedImage image : images) {
 				numImagen++;
-				Mat frame = bufferedImageToMat(image);
-				Mat frame_gray = new Mat();
-				this.facialRecognition.setIdentifyValues(device, frame, frame_gray, numImagen, personIdsEncontrados);
+				this.facialRecognition.setIdentifyValues(image, device, numImagen, personIdsEncontrados);
 				//executor.execute(this.facialRecognition);
 				this.facialRecognition.start();
 				//this.facialRecognition.run();

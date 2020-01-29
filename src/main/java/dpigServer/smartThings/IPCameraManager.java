@@ -26,10 +26,10 @@ import okhttp3.Response;
 
 public class IPCameraManager {
 	
-	private Util util;
+	private String smartThingsToken;
 	
-	public IPCameraManager(Util util){
-		this.util = util;
+	public IPCameraManager(String smartThingsToken){
+		this.smartThingsToken = smartThingsToken;
 	}
 	
 	public List<IPCamera> getIPCameras(){
@@ -45,7 +45,7 @@ public class IPCameraManager {
 	    URL url = new URL(fileUrl);
 	    
 	    URLConnection connection = url.openConnection();
-	    connection.setRequestProperty("Authorization", "Bearer "+util.getSmartThingsToken());
+	    connection.setRequestProperty("Authorization", "Bearer "+smartThingsToken);
 	   
 	    InputStream is = connection.getInputStream();
 	    OutputStream os = new FileOutputStream(destinationFile);
@@ -90,7 +90,7 @@ public class IPCameraManager {
 		OkHttpClient client = new OkHttpClient();
 		
 		Request request = new Request.Builder()
-			    .header("Authorization", "Bearer "+util.getSmartThingsToken())
+			    .header("Authorization", "Bearer "+smartThingsToken)
 			    .url(url)
 			    .build();
 

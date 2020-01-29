@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import dpigServer.utils.Util;
-
 public class ReadProperties {
 	
 	private Map<String, String> events;
@@ -19,20 +17,20 @@ public class ReadProperties {
 	
 	private BufferedReader bf;
 	
-	private Util util;
+	private String rulesFilePath;
 	
-	public ReadProperties(Util util){
-		this.util = util;
+	public ReadProperties(String rulesFilePath){
+		this.rulesFilePath = rulesFilePath;
 	}
 	
-	public Map<String,Object> readPropertiesFile() throws FileNotFoundException, IOException {
-		Map<String,Object> data = new HashMap<String, Object>();
+	public Map<String,Map<String, String>> readPropertiesFile() throws FileNotFoundException, IOException {
+		Map<String,Map<String, String>> data = new HashMap<String, Map<String, String>>();
 		
 		int totalProperties = numberOfLines();
 		events = new HashMap<String, String>();
 		alerts = new HashMap<String, String>();
 		
-		try (InputStream input = new FileInputStream(util.getRulesFilePath())) {
+		try (InputStream input = new FileInputStream(rulesFilePath)) {
 			Properties prop = new Properties();
             prop.load(input);
             
@@ -56,7 +54,7 @@ public class ReadProperties {
 	
 	private int numberOfLines() throws IOException {
 		
-		FileReader fr = new FileReader(util.getRulesFilePath());
+		FileReader fr = new FileReader(rulesFilePath);
 		bf = new BufferedReader(fr);
 		int lNumeroLineas = 0;
 		while ((bf.readLine())!=null) {

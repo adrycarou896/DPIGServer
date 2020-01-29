@@ -1,13 +1,10 @@
 package dpigServer.services;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +41,7 @@ public class InsertDataService implements CommandLineRunner{
 	
 	private Util util;
 	
-	private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
+	//private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
 		  
 	@Override
 	public void run(String... args) throws Exception {
@@ -55,40 +52,41 @@ public class InsertDataService implements CommandLineRunner{
 		 
 		this.util = new Util(trinningFolderPath, rulesFilePath, smartThingsToken, socketPort);
 		
-		
-		ReadProperties properties = new ReadProperties(util);
-		Map<String, Object> data=null;
+		saveCameras(util.getSmartThingsToken());
+		savePersons();
+		//saveFalsesPositivesImages(devices.size());
+		generateRules(util.getRulesFilePath());		
+	}
+	
+	public void generateRules(String rulesFilePath){
+		ReadProperties properties = new ReadProperties(rulesFilePath);
 		try {
-			
-			IPCameraManager ipCamerasManager = new IPCameraManager(util);
-			
-			List<IPCamera> devices = ipCamerasManager.getIPCameras();
-			for (IPCamera device : devices) {
-				ipCameraRepository.save(device);
-			}
-			
-			String[] personsNames = util.getPersonasNames();
-			 
-			for (int i = 0; i < personsNames.length; i++) {
-				Person person = new Person(personsNames[i]);
-				personRepository.save(person);
-			}
-			
-			saveFalsesPositivesImages(devices.size());
-			
-			data = properties.readPropertiesFile();
-			//GENERAR EVENTOS Y ALERTAS (REGLAS)
+			Map<String, Map<String, String>> data = properties.readPropertiesFile();
 			generateEvents(data);
 			generateAlerts(data);
-			
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
+	}
+	
+	public void saveCameras(String smartThingsToken){
+		IPCameraManager ipCamerasManager = new IPCameraManager(smartThingsToken);
+		List<IPCamera> devices = ipCamerasManager.getIPCameras();
+		for (IPCamera device : devices) {
+			ipCameraRepository.save(device);
+		}
+	}
+	
+	public void savePersons(){
+		String[] personsNames = util.getPersonsNames();
+		for (int i = 0; i < personsNames.length; i++) {
+			Person person = new Person(personsNames[i]);
+			personRepository.save(person);
+		}
 	}
 
-	private void generateEvents(Map<String,Object> data){
-		Map<String,String> events = (Map<String,String>)data.get("events");
+	private void generateEvents(Map<String,Map<String,String>> data){
+		Map<String,String> events = data.get("events");
 		Iterator iterator = events.entrySet().iterator();
         while (iterator.hasNext()) {
              Map.Entry me2 = (Map.Entry) iterator.next();
@@ -137,7 +135,7 @@ public class InsertDataService implements CommandLineRunner{
 		return event;
 	}
 	
-	private void generateAlerts(Map<String,Object> data) {
+	private void generateAlerts(Map<String,Map<String,String>> data) {
 		Map<String,String> alerts = (Map<String,String>)data.get("alerts");
 		Iterator iterator = alerts.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -218,7 +216,7 @@ public class InsertDataService implements CommandLineRunner{
 		return alertsToRun;
 	}
 	
-	private void saveFalsesPositivesImages(int numCameras){
+	/*private void saveFalsesPositivesImages(int numCameras){
 		//Recoger todas las imágenes de la carpeta donde las guardo
 		FilenameFilter imgFilter = new FilenameFilter() { 
 			public boolean accept(File dir, String name) { 
@@ -239,7 +237,7 @@ public class InsertDataService implements CommandLineRunner{
 	
 	public Map<String, File[]> getImagesFalsePostive() {
 		return imagesFalsePostive;
-	}
+	}*/
 	
 	public List<Event> getEvents(){
 		return this.events;
