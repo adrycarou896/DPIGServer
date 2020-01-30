@@ -1,5 +1,6 @@
 package dpigServer.services;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,20 +55,29 @@ public class InsertDataService implements CommandLineRunner{
 		this.util = new Util(trinningFolderPath, rulesFilePath, smartThingsToken, socketPort);
 		
 		saveCameras(util.getSmartThingsToken());
-		savePersons();
+		savePersons(util.getTrainingFolderPath());
 		//saveFalsesPositivesImages(devices.size());
 		generateRules(util.getRulesFilePath());		
 	}
 	
-	public void generateRules(String rulesFilePath){
+	public boolean generateRules(String rulesFilePath){
 		ReadProperties properties = new ReadProperties(rulesFilePath);
 		try {
 			Map<String, Map<String, String>> data = properties.readPropertiesFile();
-			generateEvents(data);
-			generateAlerts(data);
+			if(!generateEvents(data) || !generateAlerts(data)){
+				events.clear();
+				alerts.clear();
+				System.out.println("Error en el fichero de reglas");
+			}
+			else{
+				return true;
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("Error al generar reglas");
 		}
+		return false;
 	}
 	
 	public void saveCameras(String smartThingsToken){
@@ -78,38 +88,68 @@ public class InsertDataService implements CommandLineRunner{
 		}
 	}
 	
-	public void savePersons(){
-		String[] personsNames = util.getPersonsNames();
+	public void savePersons(String trainingFolderPath){
+		String[] personsNames = new File(trainingFolderPath).list();
 		for (int i = 0; i < personsNames.length; i++) {
 			Person person = new Person(personsNames[i]);
 			personRepository.save(person);
 		}
 	}
 
-	private void generateEvents(Map<String,Map<String,String>> data){
+	private boolean generateEvents(Map<String,Map<String,String>> data){
 		Map<String,String> events = data.get("events");
-		Iterator iterator = events.entrySet().iterator();
-        while (iterator.hasNext()) {
-             Map.Entry me2 = (Map.Entry) iterator.next();
-             String eventName = (String)me2.getKey();
-             String eventValue = (String)me2.getValue();
-             
-             Event event = getEvent(eventName, eventValue);
- 			 this.events.add(event);
-        } 
+		if(events!=null){
+			Iterator iterator = events.entrySet().iterator();
+	        while (iterator.hasNext()) {
+	             Map.Entry me2 = (Map.Entry) iterator.next();
+	             String eventName = (String)me2.getKey();
+	             String eventValue = (String)me2.getValue();
+	             
+	             Event event = getEvent(eventName, eventValue);
+	             if(event!=null){
+	            	 this.events.add(event);
+	             }
+	             else{
+	            	 return false;
+	             }
+	        }
+	        return true;
+		}
+        return false;
 	}
 	
 	private Event getEvent(String name, String reglaTotal) {
 		Event event = null;
 		try {
 			String[] reglaTotalArray = reglaTotal.split(":");
+			if(reglaTotalArray.length!=2)//ruta:mensaje
+			{
+				return null;
+			}
+			
 			String regla = reglaTotalArray[0];
+			regla = regla.replace(" ","");
 			String mensaje = reglaTotalArray[1];
+			String[] actionHallArray = mensaje.split(" ");
+			String action = "";
+			int hall = -1;
+			for (String actionHall : actionHallArray) {
+				if(!actionHall.isEmpty()){
+					if(action.isEmpty()){
+						action = actionHall;
+					}
+					else{
+						hall = Integer.parseInt(actionHall);
+					}
+				}
+			}
 			
 			if(!regla.contains("->")) {//camera1:Ha entrado dentro de clase
 				String cameraName = regla;
 				IPCamera ipCamera = ipCameraRepository.findByName(cameraName);
-				event = new EventSimple(ipCamera, mensaje);
+				if(ipCamera!=null){
+					event = new EventSimple(ipCamera, action, hall);
+				}
 			}
 			else {
 				String[] reglaArray = regla.split("->");
@@ -119,34 +159,50 @@ public class InsertDataService implements CommandLineRunner{
 				IPCamera ipCamera1 = ipCameraRepository.findByName(cameraName1);
 				IPCamera ipCamera2 = ipCameraRepository.findByName(cameraName2);
 				
-				event = new EventComplex(new EventSimple(ipCamera1), new EventSimple(ipCamera2), mensaje);
-				
+				if(cameraName1==null || ipCamera2==null){
+					return null;
+				}
+				event = new EventComplex(new EventSimple(ipCamera1), new EventSimple(ipCamera2), action, hall);
 				for (int i = 2; i < reglaArray.length; i++) {
 					String cameraName = reglaArray[i];
 					IPCamera camera = ipCameraRepository.findByName(cameraName);
+					if(camera==null){
+						return null;
+					}
 					Event eventSimple = new EventSimple(camera);
-					event = new EventComplex(event, eventSimple, mensaje);
+					event = new EventComplex(event, eventSimple, action, hall);
 				}
+				event.setName(name);
 			}
-			event.setName(name);
+			return event;
 
 		}catch (Exception e) {
-			System.out.println("Some event has an error");
+			e.printStackTrace();
 		}
-		return event;
+		return null;
 	}
 	
-	private void generateAlerts(Map<String,Map<String,String>> data) {
+	private boolean generateAlerts(Map<String,Map<String,String>> data) {
 		Map<String,String> alerts = (Map<String,String>)data.get("alerts");
-		Iterator iterator = alerts.entrySet().iterator();
-        while (iterator.hasNext()) {
-             Map.Entry me2 = (Map.Entry) iterator.next();
-             String alertName = (String)me2.getKey();
-             String alertValue = (String)me2.getValue();
-             
-             Alert alert = getAlert(alertName, alertValue);
- 			 this.alerts.add(alert);
-        } 
+		if(alerts!=null){
+			List<Alert> alertasCumplidas = new ArrayList<Alert>();
+			Iterator iterator = alerts.entrySet().iterator();
+	        while (iterator.hasNext()) {
+	             Map.Entry me2 = (Map.Entry) iterator.next();
+	             String alertName = (String)me2.getKey();
+	             String alertValue = (String)me2.getValue();
+	             
+	             Alert alert = getAlert(alertName, alertValue);
+	             if(alert!=null){
+	            	 this.alerts.add(alert);
+	             }
+	             else{
+	            	 return false;
+	             }
+	        } 
+	        return true;
+		}
+		return false;
 	}
 	
 	private Alert getAlert(String name, String value) {
@@ -199,8 +255,8 @@ public class InsertDataService implements CommandLineRunner{
 			Event alertEvent = alert.getEvent();
 			String eventName = event.getName();
 			if(alertEvent.getName().equals(eventName)) {
-				Date eventDate = event.getDate();
-				Date alertDate = alert.getDate();
+				Date eventDate = event.getAccomplishedDate();
+				Date alertDate = alert.getDateAlert();
 				if(alert.getOperator().equals("max")) {
 					if(eventDate.after(alertDate)) {
 						alertsToRun.add(alert);
@@ -246,6 +302,14 @@ public class InsertDataService implements CommandLineRunner{
 	
 	public List<Alert> getAlerts(){
 		return this.alerts;
+	}
+	
+	public IPCamera getIPCameraByName(String name){
+		return this.ipCameraRepository.findByName(name);
+	}
+	
+	public Person getPersonByName(String name){
+		return this.personRepository.findByName(name);
 	}
 	
 	public Util getUtil(){

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import dpigServer.model.IPCamera;
 import dpigServer.model.Match;
 import dpigServer.model.Person;
+import dpigServer.model.rule.Rule;
 import dpigServer.model.rule.alert.Alert;
 import dpigServer.model.rule.event.Event;
 import dpigServer.repository.IPCameraRepository;
@@ -60,7 +61,7 @@ public class PatternsManager {
 		return match;
 	}
 	
-	private Match getMatch(IPCamera ipCameraModel, long personId, Date date){
+	private Match getMatch(IPCamera ipCameraModel, Long personId, Date date){
 		//String personName = "person"+ personId;
 		Person person = personRepository.findPersonById(personId);
 		//Person person = personRepository.findByName(personName);
@@ -70,37 +71,48 @@ public class PatternsManager {
 		return match;
 	}
 	
-	public void findPattern(Person person) {
+	public List<Rule> findPattern(Person person) {
+		List<Event> accomplishedEvents = getAccomplishedEvents(person);
+		List<Rule> accomplishedRules = getAccomplishedRules(accomplishedEvents, person);
+		sendRules(accomplishedRules, person);
+		return accomplishedRules;
+	}
+	
+	public List<Event> getAccomplishedEvents(Person person){
 		List<Match> personMatches = matchRepository.findByPerson(person.getId());
 		
-		List<Event> eventsSuccesed = new ArrayList<Event>();
+		List<Event> accomplishdEvents = new ArrayList<Event>();
 		Event firstEvent = null;
 		for (Event event : insertDataService.getEvents()) {
 			if(event!=null) {
 				if(event.isAccomplished(personMatches)) {
-					if (firstEvent == null || event.getDate().equals(firstEvent.getDate())) {
+					if (firstEvent == null || event.getAccomplishedDate().equals(firstEvent.getAccomplishedDate())) {
 						firstEvent = event;
-						eventsSuccesed.add(event);
+						accomplishdEvents.add(event);
 					}
-					else if(event.getDate().after(firstEvent.getDate())) {
+					else if(event.getAccomplishedDate().after(firstEvent.getAccomplishedDate())) {
 						firstEvent = event;
-						eventsSuccesed.clear();
-						eventsSuccesed.add(event);
+						accomplishdEvents.clear();
+						accomplishdEvents.add(event);
 					}
 				}
 			}
 		}
-		
-		for (Event event : eventsSuccesed) {
-			System.out.println(person.getName()+" -> "+event);
+		return accomplishdEvents;
+	}
+	
+	public List<Rule> getAccomplishedRules(List<Event> events, Person person){
+		List<Rule> rulesAccomplished = new ArrayList<Rule>();
+		for (Event event : events) {
 			List<Event> personEventsSaved = this.lastEventPersons.get(person.getName());
 			if(personEventsSaved!=null){
-				if(!personEventsSaved.contains(event)){
+				if(!personEventsSaved.contains(event)){//Para que no envíe reglas repetidas
 					/*if(event.getDate().before(personEventsSaved.get(0).getDate())){
 						personEventsSaved.clear();
 					}*/
 					personEventsSaved.add(event);
-					eventServer.sendData(person,event);	
+					rulesAccomplished.add(event);
+					System.out.println(person.getName()+" -> "+event);
 				}
 			}
 			else{
@@ -110,16 +122,23 @@ public class PatternsManager {
 				this.lastEventPersons.put(person.getName(), personEventsSaved);
 				
 				eventServer.sendData(person,event);	
+				rulesAccomplished.add(event);
+				System.out.println(person.getName()+" -> "+event);
 			}
 			
 			List<Alert> eventAlerts = insertDataService.getAlertByEvent(event);
 			for (Alert alert : eventAlerts) {
 				System.out.println("Alert->"+alert.getName());
-				eventServer.sendData(person, alert);
+				rulesAccomplished.add(alert);
 			}
 		}
-		
-		
+		return rulesAccomplished;
+	}
+	
+	private void sendRules(List<Rule> rules, Person person){
+		for (Rule rule : rules) {
+			eventServer.sendData(person, rule);
+		}
 	}
 	
 	

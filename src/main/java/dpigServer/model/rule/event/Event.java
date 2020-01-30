@@ -11,7 +11,8 @@ import dpigServer.model.rule.Rule;
 public abstract class Event implements Rule{
 	
 	private String name;
-	private String message;
+	private String action;
+	private int hall;
 	private Date accomplishedDate;
 	
 	public abstract boolean isAccomplished(List<Match> personMatches);
@@ -26,23 +27,29 @@ public abstract class Event implements Rule{
 	public void setName(String name) {
 		this.name=name;
 	}
-	
-	public String getMessage(){
-		return this.message;
-	}
-	
-	public void setMessage(String mensaje){
-		this.message = mensaje;
-	}
-	
-	@Override
-	public Date getDate() {
+
+	public Date getAccomplishedDate() {
 		return this.accomplishedDate;
 	}
 	
-	@Override
-	public void setDate(Date date){
+	public void setAccomplished(Date date){
 		this.accomplishedDate = date;
+	}
+	
+	public String getAction() {
+		return action;
+	}
+	
+	public void setAction(String action) {
+		this.action = action;
+	}
+	
+	public int getHall() {
+		return hall;
+	}
+	
+	public void setHall(int hall) {
+		this.hall = hall;
 	}
 	
 	@Override
@@ -53,14 +60,10 @@ public abstract class Event implements Rule{
 	@Override
 	public JSONObject getJson() {
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("message", getMessage());
+		jsonObject.put("action", action);
+		jsonObject.put("hall", hall);
 		jsonObject.put("accomplishedDate", accomplishedDate);
 		return jsonObject;
-	}
-	
-	@Override
-	public String toString() {
-		return getMessage();
 	}
 
 }

@@ -41,7 +41,7 @@ public class Alert implements Rule{
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("event", event);
 		jsonObject.put("operator", operator);
-		jsonObject.put("dateAlert", getDate());
+		jsonObject.put("dateAlert", getDateAlert());
 		return jsonObject;
 	}
 
@@ -56,13 +56,11 @@ public class Alert implements Rule{
 		
 	}
 
-	@Override
-	public Date getDate() {
+	public Date getDateAlert() {
 		return this.dateAlert;
 	}
 
-	@Override
-	public void setDate(Date date) {
+	public void setDateAlert(Date date) {
 		this.dateAlert = date;
 	}
 

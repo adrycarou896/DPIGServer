@@ -43,12 +43,15 @@ public class ReadProperties {
    			 	propertyName = "alert"+i;
    			 	String alert = prop.getProperty(propertyName);
    			 	if(alert!=null){
+   			 		alert = alert.replace(" ","");
    			 		alerts.put(propertyName, alert);
    			 	}
    			}
 		}
-		data.put("events", events);
-		data.put("alerts", alerts);
+		if(events.size()>=1){
+			data.put("events", events);
+			data.put("alerts", alerts);
+		}
 		return data;
 	}
 	

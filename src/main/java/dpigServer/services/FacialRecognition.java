@@ -20,7 +20,6 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.springframework.stereotype.Service;
 
-import dpigServer.model.IPCamera;
 import dpigServer.training.Training;
 import dpigServer.utils.Util;
 
@@ -35,7 +34,7 @@ public class FacialRecognition extends Thread{
     
     private Map<String, List<Long>> devicePersons;
     
-    private IPCamera device;
+    private String deviceName;
     private Mat frame, frame_gray;
     private int iter;
     private List<Long> personIdsEncontrados;
@@ -57,8 +56,8 @@ public class FacialRecognition extends Thread{
     	this.rostros = new MatOfRect();
     }
     
-    public void setIdentifyValues(BufferedImage image, IPCamera device, int iter, List<Long> personIdsEncontrados){
-    	this.device = device;
+    public void setIdentifyValues(BufferedImage image, String deviceName, int iter, List<Long> personIdsEncontrados){
+    	this.deviceName = deviceName;
 		frame = bufferedImageToMat(image);
 		frame_gray = new Mat();
     	//this.personIdEncontrada = -1;
@@ -86,7 +85,7 @@ public class FacialRecognition extends Thread{
         long personId = -1;
         
         for (Rect rostro : rostrosLista) {
-    		rutaImagen = "img/imagenesEnEjecucion/img_"+device.getName()+"_"+iter+".jpg";
+    		rutaImagen = "img/imagenesEnEjecucion/img_"+deviceName+"_"+iter+".jpg";
     	    
     		//Se recorta la imagen
     		rectCrop = new Rect(rostro.x, rostro.y, rostro.width, rostro.height); 
@@ -107,7 +106,7 @@ public class FacialRecognition extends Thread{
         				//sigueEnElMismoDevice = sigueEnElMismoDevice(device.getName(), personId);
         				//Cuando cambie de device se ejecuta el find
             			//if(!sigueEnElMismoDevice){
-    					System.out.println("ENTROOOOOOOO: "+personPair.getSecond()+", "+device.getName());
+    					System.out.println("ENTROOOOOOOO: "+personId+", "+personPair.getSecond()+", "+deviceName);
     					if(!personIdsEncontrados.contains(personId)){
     						personIdsEncontrados.add(personId);
     						personIdsEncontradosEnEstaIteraccion.add(personId);

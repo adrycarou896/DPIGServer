@@ -13,9 +13,10 @@ public class EventSimple extends Event implements Serializable{
 	private int priority;
 	private IPCamera ipCamera;
 	
-	public EventSimple(IPCamera ipCamera, String mensaje) {
+	public EventSimple(IPCamera ipCamera, String action, int hall) {
 		this.ipCamera = ipCamera;
-		setMessage(mensaje);
+		setAction(action);
+		setHall(hall);
 		this.priority = 1;
 	}
 	
@@ -27,7 +28,7 @@ public class EventSimple extends Event implements Serializable{
 	@Override
 	public boolean isAccomplished(List<Match> personMatches) {
 		if(personMatches.size()>0) {
-			setDate(personMatches.get(0).getDate());
+			setAccomplished(personMatches.get(0).getDate());
 			Match ultimateMatch = personMatches.get(0);
 			if(ultimateMatch.getIpCamera().getName().equals(ipCamera.getName())) {
 				return true;

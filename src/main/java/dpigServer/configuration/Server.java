@@ -47,7 +47,7 @@ public class Server{
 					public void run() {
 						System.load(Util.LOAD_OPENCV_PATH);
 						
-						Training train = new Training(insertDataService.getUtil());
+						Training train = new Training(insertDataService.getUtil().getTrainingFolderPath());
 						train.run();
 						
 						ipCamerasRecord.setConf(train, insertDataService.getUtil());

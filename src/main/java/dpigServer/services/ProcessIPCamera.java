@@ -62,7 +62,7 @@ public class ProcessIPCamera implements Runnable{
 			List<Long> personIdsEncontrados = new ArrayList<Long>();
 			for (BufferedImage image : images) {
 				numImagen++;
-				this.facialRecognition.setIdentifyValues(image, device, numImagen, personIdsEncontrados);
+				this.facialRecognition.setIdentifyValues(image, device.getName(), numImagen, personIdsEncontrados);
 				//executor.execute(this.facialRecognition);
 				this.facialRecognition.start();
 				//this.facialRecognition.run();
