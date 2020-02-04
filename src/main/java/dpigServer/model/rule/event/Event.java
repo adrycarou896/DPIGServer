@@ -1,5 +1,6 @@
 package dpigServer.model.rule.event;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,6 @@ public abstract class Event implements Rule{
 	private Date accomplishedDate;
 	
 	public abstract boolean isAccomplished(List<Match> personMatches);
-	public abstract int getPriority();
 	
 	@Override
 	public String getName() {
@@ -62,7 +62,9 @@ public abstract class Event implements Rule{
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("action", action);
 		jsonObject.put("hall", hall);
-		jsonObject.put("accomplishedDate", accomplishedDate);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(accomplishedDate);
+		jsonObject.put("accomplishedDate", calendar.getTimeInMillis());
 		return jsonObject;
 	}
 

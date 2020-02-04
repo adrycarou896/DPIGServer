@@ -73,9 +73,7 @@ public class PatternsManager {
 	
 	public List<Rule> findPattern(Person person) {
 		List<Event> accomplishedEvents = getAccomplishedEvents(person);
-		List<Rule> accomplishedRules = getAccomplishedRules(accomplishedEvents, person);
-		sendRules(accomplishedRules, person);
-		return accomplishedRules;
+		return getAccomplishedRules(accomplishedEvents, person);
 	}
 	
 	public List<Event> getAccomplishedEvents(Person person){
@@ -86,7 +84,7 @@ public class PatternsManager {
 		for (Event event : insertDataService.getEvents()) {
 			if(event!=null) {
 				if(event.isAccomplished(personMatches)) {
-					if (firstEvent == null || event.getAccomplishedDate().equals(firstEvent.getAccomplishedDate())) {
+					if (firstEvent == null || event.getAccomplishedDate().equals(firstEvent.getAccomplishedDate())) {//Guarda solo el último evento que se cumplió y si se cumpplen dos a la vez se guardan los dos
 						firstEvent = event;
 						accomplishdEvents.add(event);
 					}
@@ -101,9 +99,9 @@ public class PatternsManager {
 		return accomplishdEvents;
 	}
 	
-	public List<Rule> getAccomplishedRules(List<Event> events, Person person){
+	public List<Rule> getAccomplishedRules(List<Event> accomplishedEvents, Person person){
 		List<Rule> rulesAccomplished = new ArrayList<Rule>();
-		for (Event event : events) {
+		for (Event event : accomplishedEvents) {
 			List<Event> personEventsSaved = this.lastEventPersons.get(person.getName());
 			if(personEventsSaved!=null){
 				if(!personEventsSaved.contains(event)){//Para que no envíe reglas repetidas
@@ -112,7 +110,7 @@ public class PatternsManager {
 					}*/
 					personEventsSaved.add(event);
 					rulesAccomplished.add(event);
-					System.out.println(person.getName()+" -> "+event);
+					System.out.println(person.getName()+" peii -> "+event.getAction() +" "+event.getHall());
 				}
 			}
 			else{
@@ -120,10 +118,9 @@ public class PatternsManager {
 				personEventsSaved.add(event);
 				
 				this.lastEventPersons.put(person.getName(), personEventsSaved);
-				
-				eventServer.sendData(person,event);	
+
 				rulesAccomplished.add(event);
-				System.out.println(person.getName()+" -> "+event);
+				System.out.println(person.getName()+" peio -> "+event.getAction() +" "+event.getHall());
 			}
 			
 			List<Alert> eventAlerts = insertDataService.getAlertByEvent(event);
@@ -135,7 +132,7 @@ public class PatternsManager {
 		return rulesAccomplished;
 	}
 	
-	private void sendRules(List<Rule> rules, Person person){
+	public void sendRules(List<Rule> rules, Person person){
 		for (Rule rule : rules) {
 			eventServer.sendData(person, rule);
 		}

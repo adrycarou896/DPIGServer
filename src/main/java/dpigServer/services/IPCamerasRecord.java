@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -31,24 +29,18 @@ public class IPCamerasRecord implements Runnable{
 	private IPCameraRepository ipCameraRepository;
 	
 	@Autowired
-	private FacialRecognition reconocimientoFacial;
+	private FacialRecognition reconocimientoFacial;//Solo con train
 	
 	@Autowired
 	private ProcessIPCamera processIPCamera;
 	
 	private Map<String, String> deviceIdVideoURL;
 	
-	private IPCamera deviceWithImages;
-	
 	public void setConf(Training entrenamiento, Util util){
 		this.reconocimientoFacial.setConf(entrenamiento);
 		this.ipCamerasManager = new IPCameraManager(util.getSmartThingsToken());
 		this.deviceIdVideoURL = new HashMap<String, String>();
 		
-	}
-	
-	public Map<String, List<Long>> getDevicePersons(){
-		return this.reconocimientoFacial.getDevicePersons();
 	}
 	
 	@Override
@@ -58,26 +50,11 @@ public class IPCamerasRecord implements Runnable{
 	    	List<IPCamera> devices = (List<IPCamera>) ipCameraRepository.findAll();
 	    	for (IPCamera device : devices) {
 	    		Pair<String, Date> videoURLAndCaptureTime = ipCamerasManager.getIPCameraVideoURLAndCaptureTime(device.getDeviceId());
-	    		
-				String videoURL = videoURLAndCaptureTime.left;
-				Date captureTime = videoURLAndCaptureTime.right;
 				
-				if(videoURL!=null){
-					if(deviceWithImages!=null){
-						videoURLAndCaptureTime = ipCamerasManager.getIPCameraVideoURLAndCaptureTime(deviceWithImages.getDeviceId());
-						videoURL = videoURLAndCaptureTime.left;
-						captureTime = videoURLAndCaptureTime.right;
-					}
-				}
-				else{
-					deviceWithImages = device;
-					videoURLAndCaptureTime = ipCamerasManager.getIPCameraVideoURLAndCaptureTime(deviceWithImages.getDeviceId());
-					videoURL = videoURLAndCaptureTime.left;
-					captureTime = videoURLAndCaptureTime.right;
-				}
-				
-				ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
-				if(videoURL!=null){
+				if(videoURLAndCaptureTime!=null){
+					String videoURL = videoURLAndCaptureTime.left;
+					Date captureTime = videoURLAndCaptureTime.right;
+					
 					//Comprobar que se hace el reconocmiento de esa cámara si esta ha detectado movimiento
 					String anteriorVideoURL = null;
 					if(this.deviceIdVideoURL.containsKey(device.getDeviceId())){

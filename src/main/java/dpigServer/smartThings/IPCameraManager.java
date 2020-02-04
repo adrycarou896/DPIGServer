@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -128,11 +129,11 @@ public class IPCameraManager {
 				SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 				Date captureTime;
 				try {
-					captureTime = format.parse(captureTimeString);
+					 captureTime = format.parse(captureTimeString);
 					
 					 Calendar calendar = Calendar.getInstance();
 					 calendar.setTime(captureTime);
-					 calendar.add(Calendar.HOUR, 1);
+					 calendar.add(Calendar.HOUR, 2);
 					 captureTime = calendar.getTime();
 					 
 					return new Pair<String, Date>(videoURL, captureTime);

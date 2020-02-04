@@ -1,5 +1,6 @@
 package dpigServer.model.rule.alert;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONObject;
@@ -41,7 +42,9 @@ public class Alert implements Rule{
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("event", event);
 		jsonObject.put("operator", operator);
-		jsonObject.put("dateAlert", getDateAlert());
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dateAlert);
+		jsonObject.put("dateAlert", calendar.getTimeInMillis());
 		return jsonObject;
 	}
 

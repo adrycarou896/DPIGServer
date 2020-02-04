@@ -10,19 +10,19 @@ public class EventSimple extends Event implements Serializable{
 
 	private static final long serialVersionUID = 7630199873467233523L;
 	
-	private int priority;
+	//private int priority;
 	private IPCamera ipCamera;
 	
 	public EventSimple(IPCamera ipCamera, String action, int hall) {
 		this.ipCamera = ipCamera;
 		setAction(action);
 		setHall(hall);
-		this.priority = 1;
+		//this.priority = 1;
 	}
 	
 	public EventSimple(IPCamera ipCamera) {
 		this.ipCamera = ipCamera;
-		this.priority = 1;
+		//this.priority = 1;
 	}
 	
 	@Override
@@ -37,8 +37,4 @@ public class EventSimple extends Event implements Serializable{
 		return false;
 	}
 
-	@Override
-	public int getPriority() {
-		return this.priority;
-	}
 }

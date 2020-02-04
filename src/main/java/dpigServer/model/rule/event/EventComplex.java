@@ -9,7 +9,7 @@ public class EventComplex extends Event implements Serializable{
 
 	private static final long serialVersionUID = 6161696925923575356L;
 
-	private int priority;
+	//private int priority;
 	private Event event1, event2;
 	
 	public EventComplex(Event event1, Event event2, String action, int hall) {
@@ -17,7 +17,7 @@ public class EventComplex extends Event implements Serializable{
 		this.event2 = event2;
 		setAction(action);
 		setHall(hall);
-		this.priority = this.event1.getPriority()+this.event2.getPriority();
+		//this.priority = this.event1.getPriority()+this.event2.getPriority();
 	}
 
 	public Event getEvent1() {
@@ -44,11 +44,6 @@ public class EventComplex extends Event implements Serializable{
 			return true;
 		}
 		return false;
-	}
-	
-	@Override
-	public int getPriority() {
-		return this.priority;
 	}
 
 }

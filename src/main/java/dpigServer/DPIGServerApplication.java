@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import dpigServer.utils.InputCheck;
 
 @SpringBootApplication
-@EnableAutoConfiguration
+@EnableAutoConfiguration 
 public class DPIGServerApplication {
 
 	public static void main(String[] args) {

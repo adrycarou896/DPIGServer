@@ -34,7 +34,6 @@ public class RulesManagerTest{
 		insertDataService.getAlerts().clear();
 	}
 	
-	//Probar con cualquier nombre para un evento y alerta.
 	@Test
 	public void PU16() throws FileNotFoundException, IOException {
 		insertDataService.saveCameras(smartThingsToken);
