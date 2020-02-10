@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -49,45 +48,47 @@ public class ProcessIPCamera implements Runnable{
 		try{
 			String videoFilePath = saveVideo();
 			
-			ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFilePath);
-			List<BufferedImage> images = decodeAndCaptureFramesnew.getImages();
-			
-			//ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
-			
-			int numImagen=0;
-			int contDecision = 0;
-			List<Long> personIdsEncontrados = new ArrayList<Long>();
-			for (BufferedImage image : images) {
-				numImagen++;
-				contDecision++;
-				if(contDecision==10){
-					contDecision=0;
-					this.facialRecognition.setIdentifyValues(image, device.getName(), numImagen);
-					//executor.execute(this.facialRecognition);
-					this.facialRecognition.start();
-					//this.facialRecognition.run();
-					List<Long> personIdsEncontradosEnEstaIteraccion = this.facialRecognition.getPersonIdsEncontradosEnEstaIteraccion();
-					
-					boolean hayPersonas = false;
-					for (Long personIdEncontradoEnEstaIteraccion : personIdsEncontradosEnEstaIteraccion) {
-						if(!personIdsEncontrados.contains(personIdEncontradoEnEstaIteraccion)){
-							personIdsEncontrados.add(personIdEncontradoEnEstaIteraccion);
-							
-							System.out.println("MATCHH: "+personIdEncontradoEnEstaIteraccion+", "+device.getName());
-							captureTime=getCaptureTime(numImagen, images.size());
-							Match match = this.patternsManager.saveMatch(device, personIdEncontradoEnEstaIteraccion, captureTime);
-							List<Rule> accomplishedRules = this.patternsManager.findPattern(match.getPerson());
-							this.patternsManager.sendRules(accomplishedRules, match.getPerson());
+			if(videoFilePath!=null){
+				ReadVideoFrames decodeAndCaptureFramesnew = new ReadVideoFrames(videoFilePath);
+				List<BufferedImage> images = decodeAndCaptureFramesnew.getImages();
+				
+				//ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
+				
+				int numImagen=0;
+				int contDecision = 0;
+				List<Long> personIdsEncontrados = new ArrayList<Long>();
+				for (BufferedImage image : images) {
+					numImagen++;
+					contDecision++;
+					if(contDecision==10){
+						contDecision=0;
+						this.facialRecognition.setIdentifyValues(image, device.getName(), numImagen);
+						//executor.execute(this.facialRecognition);
+						this.facialRecognition.start();
+						//this.facialRecognition.run();
+						List<Long> personIdsEncontradosEnEstaIteraccion = this.facialRecognition.getPersonIdsEncontradosEnEstaIteraccion();
+						
+						boolean hayPersonas = false;
+						for (Long personIdEncontradoEnEstaIteraccion : personIdsEncontradosEnEstaIteraccion) {
+							if(!personIdsEncontrados.contains(personIdEncontradoEnEstaIteraccion)){
+								personIdsEncontrados.add(personIdEncontradoEnEstaIteraccion);
+								
+								System.out.println("MATCHH: "+personIdEncontradoEnEstaIteraccion+", "+device.getName());
+								captureTime=getCaptureTime(numImagen, images.size());
+								Match match = this.patternsManager.saveMatch(device, personIdEncontradoEnEstaIteraccion, captureTime);
+								List<Rule> accomplishedRules = this.patternsManager.findPattern(match.getPerson());
+								this.patternsManager.sendRules(accomplishedRules, match.getPerson());
+							}
+							//hayPersonas=true;
 						}
-						//hayPersonas=true;
-					}
-					if(hayPersonas){
-						break;
+						if(hayPersonas){
+							break;
+						}
 					}
 				}
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			System.out.println("Error de video");
 		}
 		
 	}
@@ -108,8 +109,13 @@ public class ProcessIPCamera implements Runnable{
 			videoFolder.mkdirs();
 		}
 		String videoFilePath = videoFolderPath + device.getName()+".mp4";
-		ipCamerasManager.saveFile(videoURL, videoFilePath);
-		return videoFilePath;
+		try{
+			ipCamerasManager.saveFile(videoURL, videoFilePath);
+			return videoFilePath;
+		}catch(Exception e){
+			
+		}
+		return null;
 	}
 	
 	public static Mat bufferedImageToMat(BufferedImage bi) {

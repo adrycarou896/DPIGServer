@@ -27,7 +27,7 @@ public class SocketServer implements Runnable, ISocketServer {
 	
 	@Autowired
 	private InsertDataService insertDataService;
-	
+
 	@Override
 	public void run() {
 		Socket s;
@@ -51,15 +51,25 @@ public class SocketServer implements Runnable, ISocketServer {
 					ObjectOutputStream output =  new ObjectOutputStream(s.getOutputStream());
 					JSONObject dataJSON = new JSONObject();
 			    	dataJSON.put("person", person.getJson());
-			    	dataJSON.put(rule.getType(), rule.getJson());
-			    	output.writeObject(dataJSON.toString());
+			    	dataJSON.put("type", rule.getType());
+			    	dataJSON.put("rule", rule.getJson());
+			    	try{
+			    		output.writeObject(dataJSON.toString());
+			    	}catch(Exception e){
+			    		try {
+							Thread.sleep(4000);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+			    		output.writeObject(dataJSON.toString());
+			    	}
 				}
 				else {
 					connections.remove(s);
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Error de conexión al puerto");
 		}
 		
 		//Crear outputstream para enviar mensaje a través del socket

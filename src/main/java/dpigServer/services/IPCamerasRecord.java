@@ -84,7 +84,7 @@ public class IPCamerasRecord implements Runnable{
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			//System.out.println("URL error");
 		}
 	}
 	

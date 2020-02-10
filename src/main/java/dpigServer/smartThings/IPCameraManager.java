@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -105,6 +104,8 @@ public class IPCameraManager {
 		
 		JSONObject responseJSON = getSimpleRequest(Util.SMARTTHINGS_DEVICES+"/"+deviceId+"/status");
 		
+		//String components = responseJSON.get("components").toString();
+		//System.out.println(components);
 		JSONObject componentsJSON = new JSONObject(responseJSON.get("components").toString());
 		JSONObject mainJSON = new JSONObject(componentsJSON.get("main").toString());
 		JSONObject videoCaptureJSON = new JSONObject(mainJSON.get("videoCapture").toString());
@@ -133,7 +134,8 @@ public class IPCameraManager {
 					
 					 Calendar calendar = Calendar.getInstance();
 					 calendar.setTime(captureTime);
-					 calendar.add(Calendar.HOUR, 2);
+					 calendar.add(Calendar.HOUR, 1);
+					 calendar.add(Calendar.MONTH, 1);
 					 captureTime = calendar.getTime();
 					 
 					return new Pair<String, Date>(videoURL, captureTime);

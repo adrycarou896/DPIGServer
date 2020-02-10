@@ -40,12 +40,6 @@ public class PatternsManager {
 	
 	private Map<String, List<Event>> lastEventPersons = new HashMap<String,List<Event>>();
 	
-	//@Autowired
-	//private ImageFalsePositiveRepository imageFalsePositiveRepository;
-	
-	//private Map<String, List<ImageFalsePositive>> imagesFalsePositiveByDevice = new HashMap<String, List<ImageFalsePositive>>();
-	//private Map<String, File[]> imagesFalsePositiveByDevice = new HashMap<String, File[]>();
-	
 	public Match saveMatch(IPCamera ipCameraModel, long personId, Date date){
 		
 		Match match = getMatch(ipCameraModel, personId, date);
@@ -62,10 +56,7 @@ public class PatternsManager {
 	}
 	
 	private Match getMatch(IPCamera ipCameraModel, Long personId, Date date){
-		//String personName = "person"+ personId;
 		Person person = personRepository.findPersonById(personId);
-		//Person person = personRepository.findByName(personName);
-		
 		IPCamera ipCamera = ipCameraRepository.findByIPCameraId(ipCameraModel.getId());
 		Match match = new Match(ipCamera, person, date);
 		return match;
@@ -84,7 +75,7 @@ public class PatternsManager {
 		for (Event event : insertDataService.getEvents()) {
 			if(event!=null) {
 				if(event.isAccomplished(personMatches)) {
-					if (firstEvent == null || event.getAccomplishedDate().equals(firstEvent.getAccomplishedDate())) {//Guarda solo el último evento que se cumplió y si se cumpplen dos a la vez se guardan los dos
+					if (firstEvent == null || event.getAccomplishedDate().equals(firstEvent.getAccomplishedDate())) {
 						firstEvent = event;
 						accomplishdEvents.add(event);
 					}
@@ -104,13 +95,10 @@ public class PatternsManager {
 		for (Event event : accomplishedEvents) {
 			List<Event> personEventsSaved = this.lastEventPersons.get(person.getName());
 			if(personEventsSaved!=null){
-				if(!personEventsSaved.contains(event)){//Para que no envíe reglas repetidas
-					/*if(event.getDate().before(personEventsSaved.get(0).getDate())){
-						personEventsSaved.clear();
-					}*/
+				if(!personEventsSaved.contains(event)){
 					personEventsSaved.add(event);
 					rulesAccomplished.add(event);
-					System.out.println(person.getName()+" peii -> "+event.getAction() +" "+event.getHall());
+					System.out.println(person.getName()+": "+event.getAction() +"-> "+event.getHall());
 				}
 			}
 			else{
@@ -120,7 +108,7 @@ public class PatternsManager {
 				this.lastEventPersons.put(person.getName(), personEventsSaved);
 
 				rulesAccomplished.add(event);
-				System.out.println(person.getName()+" peio -> "+event.getAction() +" "+event.getHall());
+				System.out.println(person.getName()+": "+event.getAction() +" -> "+event.getHall());
 			}
 			
 			List<Alert> eventAlerts = insertDataService.getAlertByEvent(event);
@@ -135,6 +123,11 @@ public class PatternsManager {
 	public void sendRules(List<Rule> rules, Person person){
 		for (Rule rule : rules) {
 			eventServer.sendData(person, rule);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				System.out.println("Error en la conexión a la hora de enviar hilos");
+			}
 		}
 	}
 	

@@ -55,9 +55,10 @@ public class Server{
 							long inicio = System.currentTimeMillis();
 							ipCamerasRecord.run();
 							long fin = System.currentTimeMillis();
-							System.out.println("Tiempo->"+((fin-inicio)/1000));
+							//System.out.println("Tiempo->"+((fin-inicio)/1000));
 							try {
 								Thread.sleep(1000);
+								//System.out.println("Ha pasado 1 segundo");
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}

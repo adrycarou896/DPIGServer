@@ -41,9 +41,7 @@ public class InsertDataService implements CommandLineRunner{
 	private List<Alert> alerts = new ArrayList<Alert>();
 	
 	private Util util;
-	
-	//private Map<String, File[]> imagesFalsePostive = new HashMap<String, File[]>();
-		  
+
 	@Override
 	public void run(String... args) throws Exception {
 		if (args.length != 4) return;
@@ -149,6 +147,7 @@ public class InsertDataService implements CommandLineRunner{
 				IPCamera ipCamera = ipCameraRepository.findByName(cameraName);
 				if(ipCamera!=null){
 					event = new EventSimple(ipCamera, action, hall);
+					event.setName(name);
 				}
 			}
 			else {
@@ -272,29 +271,6 @@ public class InsertDataService implements CommandLineRunner{
 		}
 		return alertsToRun;
 	}
-	
-	/*private void saveFalsesPositivesImages(int numCameras){
-		//Recoger todas las imágenes de la carpeta donde las guardo
-		FilenameFilter imgFilter = new FilenameFilter() { 
-			public boolean accept(File dir, String name) { 
-                name = name.toLowerCase(); 
-                return name.endsWith(".jpg") || name.endsWith(".pgm") || name.endsWith(".png"); 
-            } 
-        }; 
-        
-        for (int i = 1; i <= numCameras; i++) {
-        	long ipCameraId = i;
-        	IPCamera ipCamera = ipCameraRepository.findByIPCameraId(ipCameraId);
-        	String ipCameraName = ipCamera.getName();
-        	String fileDir = "img/Cameras/"+ipCameraName+"/falsesPositivesImages/";
-        	File root = new File(fileDir); 
-        	this.imagesFalsePostive.put(ipCamera.getDeviceId(), root.listFiles(imgFilter));
-		}	
-	}
-	
-	public Map<String, File[]> getImagesFalsePostive() {
-		return imagesFalsePostive;
-	}*/
 	
 	public List<Event> getEvents(){
 		return this.events;

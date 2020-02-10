@@ -40,7 +40,7 @@ public class Alert implements Rule{
 	
 	public JSONObject getJson() {
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("event", event);
+		jsonObject.put("event", event.getJson());
 		jsonObject.put("operator", operator);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(dateAlert);

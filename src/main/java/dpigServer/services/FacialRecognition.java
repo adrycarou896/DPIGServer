@@ -4,6 +4,7 @@ import static org.opencv.objdetect.Objdetect.CASCADE_SCALE_IMAGE;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,11 @@ public class FacialRecognition extends Thread{
     	this.entrenamiento = entrenamiento;
 		this.devicePersons = new HashMap<>();
 		
+    	File directorioEnEjecucion = new File("img/imagenesEnEjecucion");
+    	if(!directorioEnEjecucion.exists()){
+    		directorioEnEjecucion.mkdir();
+    	}
+		
     }
     
     public void setConf(){
@@ -75,6 +81,7 @@ public class FacialRecognition extends Thread{
         Rect rectCrop = new Rect();
         
         for (Rect rostro : rostrosLista) {
+        	
     		String rutaImagen = "img/imagenesEnEjecucion/img_"+deviceName+"_"+iter+".jpg";
     	    
     		//Se recorta la imagen
@@ -83,7 +90,7 @@ public class FacialRecognition extends Thread{
     		
     		//Se pone en un tamaño adecuado
 			Mat frameAdecuado = new Mat();
-			Imgproc.resize(frameRecortado, frameAdecuado, new Size(52, 52));
+			Imgproc.resize(frameRecortado, frameAdecuado, new Size(100, 100));
 			
 			//Se guarda la imagen
     		Imgcodecs.imwrite(rutaImagen, frameAdecuado);
@@ -93,6 +100,7 @@ public class FacialRecognition extends Thread{
     			long personId = (long) personPair.getFirst();
     			if(!personIdsEncontradosEnEstaIteraccion.contains(personId)){
     				//System.out.println("ENTROOOOOOOO: "+personId+", "+personPair.getSecond()+", "+deviceName);
+    				 //System.out.println(personPair.getSecond());
 					personIdsEncontradosEnEstaIteraccion.add(personId);
 				}
         	}

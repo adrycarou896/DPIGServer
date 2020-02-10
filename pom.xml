@@ -2,13 +2,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>com.javarevolutions</groupId>
-	<artifactId>springboot</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
-
-	<parent>
+	<groupId>com.dpigserver</groupId>
+	<artifactId>DPIGServer</artifactId>
+	<version>1.0</version>
+	<repositories>
+		<repository>
+			<id>local-repo</id>
+			<url>file://${basedir}\repo</url>
+		</repository>
+	</repositories>
+	<parent>  
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.4.RELEASE</version>
@@ -70,14 +73,278 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.dpigserver</groupId>
+			<artifactId>xuggle-xuggler</artifactId>
+			<version>5.4</version>
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>com.dpigserver</groupId>
+			<artifactId>opencv-400</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		
+		<!-- https://mvnrepository.com/artifact/org.bytedeco/javacpp -->
+		<dependency>
+		    <groupId>com.dpigserver</groupId>
+		    <artifactId>javacpp</artifactId>
+		    <version>1.2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-math3</artifactId>
+		    <version>3.6.1</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.dpigserver</groupId>
+		    <artifactId>javacv</artifactId>
+		    <version>1.2</version>
+		</dependency>
+		
+		<dependency>
+   		 <groupId>org.json</groupId>
+    		<artifactId>json</artifactId>
+    		<version>20140107</version>
+		</dependency>
+		
+		
+		
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>javase</artifactId>
+    <version>1.7</version>
+</dependency>
 
-	</dependencies>
+<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco/javacv-platform -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>javacv-platform</artifactId>
+    <version>1.4.4</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/videoinput-platform -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>videoinput-platform</artifactId>
+    <version>0.200-1.4.4</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>okhttp</artifactId>
+    <version>3.9.0</version> 
+</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/com.squareup.okio/okio -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>okio</artifactId>
+    <version>1.13.0</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/ffmpeg -->
+<dependency> 
+    <groupId>com.dpigserver</groupId>
+    <artifactId>ffmpeg</artifactId>
+    <version>3.0.2-1.2</version>   
+</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/org.boofcv/boofcv-calibration -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>boofcv-calibration</artifactId>
+    <version>0.27</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.boofcv/boofcv-feature -->
+<dependency> 
+    <groupId>com.dpigserver</groupId>
+    <artifactId>boofcv-feature</artifactId>
+    <version>0.27</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.boofcv/boofcv-geo -->
+<dependency> 
+    <groupId>com.dpigserver</groupId>
+    <artifactId>boofcv-geo</artifactId>
+    <version>0.27</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.boofcv/boofcv-io -->
+<!-- https://mvnrepository.com/artifact/org.boofcv/boofcv-ip -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>boofcv-ip</artifactId>  
+    <version>0.27</version>
+</dependency>
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>boofcv-io</artifactId>
+    <version>0.27</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.ddogleg/ddogleg -->
+<dependency>
+     <groupId>com.dpigserver</groupId>
+    <artifactId>ddogleg</artifactId>
+    <version>0.11</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.ejml/ejml-core -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>ejml-core</artifactId>
+    <version>0.31</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.ejml/ejml-fdense -->
+<dependency>
+    <groupId>com.dpigserver</groupId> 
+    <artifactId>ejml-fdense</artifactId> 
+    <version>0.31</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.ejml/ejml-ddense -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>ejml-ddense</artifactId>
+    <version>0.31</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.ejml/ejml-simple -->
+<!-- https://mvnrepository.com/artifact/org.georegression/georegression -->
+<dependency> 
+    <groupId>com.dpigserver</groupId>
+    <artifactId>georegression</artifactId>
+    <version>0.13</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+<!-- https://mvnrepository.com/artifact/com.github.downgoon/MarvinFramework -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>MarvinFramework</artifactId>
+    <version>1.5.5</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/artoolkitplus -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>artoolkitplus</artifactId>
+    <version>2.3.1-1.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/flandmark -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>flandmark</artifactId>
+    <version>1.07-1.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/flycapture -->
+<dependency>
+     <groupId>com.dpigserver</groupId>
+    <artifactId>flycapture</artifactId>
+    <version>2.9.3.43-1.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/libdc1394 -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>libdc1394</artifactId>
+    <version>2.2.4-1.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/libfreenect -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>libfreenect</artifactId>
+    <version>0.5.3-1.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/videoinput -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>videoinput</artifactId>
+    <version>0.200-1.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/opencv-platform -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>opencv-platform</artifactId>
+    <version>4.0.1-1.4.4</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/opencv -->
+<dependency>
+    <groupId>com.dpigserver</groupId>
+    <artifactId>opencv-windows-x86_64</artifactId>
+    <version>4.0.1-1.4.4</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>core</artifactId>
+    <version>2.0</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/opencv -->
+<dependency>
+    <groupId>org.bytedeco.javacpp-presets</groupId>
+    <artifactId>opencv</artifactId>
+    <version>4.0.1-1.4.4</version>
+</dependency>		
+	</dependencies>	
 	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/main/test</testSourceDirectory>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.7.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>
+										dpigServer.DPIGServerApplication
+									</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 </project>
